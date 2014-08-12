@@ -20,7 +20,7 @@ app.client.addListener("message", function (from, to, message) {
 	p.innerText = from + " => " + to + " : " + message;
 	document.body.appendChild(p);
 
-	window.scrollTop = document.body.scrollHeight;
+	document.body.scrollTop = document.body.scrollHeight;
 });
 
 app.client.addListener("pm", function (from, message) {
@@ -30,7 +30,7 @@ app.client.addListener("pm", function (from, message) {
 	p.innerText = from + " => " + to + " : " + message;
 	document.body.appendChild(p);
 
-	window.scrollTop = document.body.scrollHeight;
+	document.body.scrollTop = document.body.scrollHeight;
 });
 
 app.client.addListener("names", function (channel, nicks) {
@@ -43,6 +43,8 @@ app.client.addListener("nick", function (oldnick, newnick, channels, message) {
 	var p = document.createElement("p");
 	p.innerText = oldnick + " will now be called " + newnick;
 	document.body.appendChild(p);
+
+	document.body.scrollTop = document.body.scrollHeight;
 });
 
 app.client.addListener("join", function (channel, nick, message) {
@@ -51,6 +53,8 @@ app.client.addListener("join", function (channel, nick, message) {
 	var p = document.createElement("p");
 	p.innerText = nick + " joined " + channel;
 	document.body.appendChild(p);
+
+	document.body.scrollTop = document.body.scrollHeight;
 });
 
 app.client.addListener("error", function(message) {
