@@ -13,11 +13,11 @@ app.client = new irc.Client("irc.smoothirc.net", "Nick", {
 
 app.tabs = [];
 
-app.client.addListener("message", function (from, to, message) {
+app.client.addListener("message#", function (from, to, message) {
 	console.log("message : ", arguments);
 
 	var p = document.createElement("p");
-	p.innerText = from + " => " + to + " : " + message;
+	p.innerText = from + " (" + to + ") : " + message;
 	document.body.appendChild(p);
 
 	document.body.scrollTop = document.body.scrollHeight;
@@ -27,7 +27,7 @@ app.client.addListener("pm", function (from, message) {
 	console.log("pm : ", arguments);
 
 	var p = document.createElement("p");
-	p.innerText = from + " => " + to + " : " + message;
+	p.innerText = from + " : " + message;
 	document.body.appendChild(p);
 
 	document.body.scrollTop = document.body.scrollHeight;
