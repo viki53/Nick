@@ -20,6 +20,7 @@ Cette application est basée sur [node-webkit](https://github.com/rogerwang/node
 En admettant que vous soyez déjà dans le dossier du projet :
 
 ```
+npm install
 /Applications/node-webkit.app/Contents/MacOS/node-webkit ./
 ```
 
