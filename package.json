@@ -1,0 +1,24 @@
+{
+	"name": "Nick",
+	"title": "Nick — IRC Client",
+	"description": "Un client IRC simple et ergonomique",
+	"main": "html/index.html",
+	"window": {
+		"width": 600,
+		"height": 400,
+		"position": "center",
+		"toolbar": true,
+		"frame": true,
+		"icon": "img/logo-72x72.png"
+	},
+	"dependencies": {
+		"irc": "0.3.*"
+	},
+	"maintainers": [
+		{
+			"name": "Corentin Hatte",
+			"email": "contact@corentin-hatte.eu",
+			"web": "http://corentin-hatte.eu/"
+		}
+	]
+}

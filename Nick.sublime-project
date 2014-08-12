@@ -1,0 +1,18 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "Launch with Node-WebKit",
+			"shell": true,
+			"working_dir": "${project_path:${folder}}",
+			"cmd": "/Applications/node-webkit.app/Contents/MacOS/node-webkit ./"
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "./",
+			"follow_symlinks": true
+		}
+	]
+}
