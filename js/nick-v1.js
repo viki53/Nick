@@ -246,11 +246,11 @@ NickApp.Server.prototype.onPrivateMessage = function (from, message) {
 
 	var item = document.createElement("li");
 	item.className = "private-message";
-	item.innerText = from + " : " + message;
-	item.dataset.author = nickname;
+	item.innerText = "(MP) " + message;
+	item.dataset.author = from;
 	this.tab_content_list.appendChild(item);
 
-	this.tab_content.scrollTop = this.tab_content.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 }
 NickApp.Server.prototype.onNicksReceive = function (channel_name, nicks) {
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
@@ -270,7 +270,7 @@ NickApp.Server.prototype.onUserNickChange = function (oldnickname, newnickname, 
 	item.dataset.author = newnickname;
 	this.tab_content_list.appendChild(item);
 
-	this.tab_content.scrollTop = this.tab_content.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 }
 NickApp.Server.prototype.onUserQuit = function (nickname, reason, channels, message) {
 	channels.forEach(function (channel_name) {
@@ -384,7 +384,7 @@ NickApp.Channel.prototype.onPublicMessage = function (nickname, text, message) {
 
 	this.app.processMessageContent(item);
 
-	this.tab_content.scrollTop = this.tab_content.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 }
 NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 	console.log("names : ", arguments);
@@ -429,7 +429,7 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 	item.dataset.author = nickname;
 	this.tab_content_list.appendChild(item);
 
-	this.tab_content.scrollTop = this.tab_content.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 
 	var user_li = document.createElement("li");
 	user_li.textContent = user.name;
@@ -481,7 +481,7 @@ NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 	item.dataset.author = nickname;
 	this.tab_content_list.appendChild(item);
 
-	this.tab_content.scrollTop = this.tab_content.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 }
 
 NickApp.User = function (app, name, role) {
