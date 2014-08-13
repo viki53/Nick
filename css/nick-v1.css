@@ -87,7 +87,7 @@ body{
 	padding: .25em .5em .25em 9.5em;
 	white-space: pre-wrap;
 }
-.irc-tab-content-list>li:nth-last-child(2n+1){
+.irc-tab-content-list>li:hover{
 	background-color: #f9f9f9;
 }
 .irc-tab-content-list>li::before{
