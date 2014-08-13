@@ -16,6 +16,14 @@ body{
 	overflow: hidden;
 }
 
+a{
+	color: inherit;
+	text-decoration: underline;
+}
+a:hover{
+	text-decoration: none;
+}
+
 .page{
 	position: fixed;
 	top: 0;
@@ -69,6 +77,21 @@ body{
 .irc-tab-content.active{
 	display: block;
 }
+.irc-tab-content-topic{
+	box-sizing: border-box;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	margin: 0;
+	padding: .5em;
+	height: 2em;
+	font-size: 1em;
+	font-weight: normal;
+	line-height: 1;
+	background-color: #eeeeee;
+	border-bottom: 1px solid #e0e0e0;
+}
 .irc-tab-content-list{
 	position: absolute;
 	right: 0;
@@ -78,6 +101,9 @@ body{
 	padding: 0;
 	overflow-y: auto;
 	list-style: none;
+}
+.irc-tab-content-topic+.irc-tab-content-list{
+	top: 2em;
 }
 .irc-tab-content-list:not(:last-child){
 	bottom: 2em;

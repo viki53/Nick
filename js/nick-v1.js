@@ -30,6 +30,8 @@ NickApp = function () {
 
 	this.main_window = gui.Window.get();
 
+	this.main_window.menu = new gui.Menu({ type: 'menubar' });
+
 	this.main_window.showDevTools();
 	this.main_window.focus();
 
@@ -37,7 +39,7 @@ NickApp = function () {
 
 	this.main_window.on('closed', this.onWindowClose.bind(this));
 }
-NickApp.prototype.onWindowClose = function() {
+NickApp.prototype.onWindowClose = function () {
 	this.servers.forEach(function (server) {
 		server.client.disconnect("Nick client exit");
 	});
@@ -57,6 +59,10 @@ NickApp.prototype.filter = function (array, predicate, returnFirst) {
 			return array[i];
 		}
 		results.push(array[i]);
+	}
+
+	if (returnFirst) {
+		return;
 	}
 
 	return results;
@@ -85,13 +91,13 @@ NickApp.prototype.colors = [
 	"#056f00",
 	"#558b2f",
 	"#9e9d24",
-	"#f9a825",
+	// "#f9a825",
 	"#ff8f00",
 	"#ef6c00",
 	"#d84315",
 	"#4e342e"
 ]
-NickApp.prototype.loadConfig = function() {
+NickApp.prototype.loadConfig = function () {
 	if (fs.existsSync(this.config_file)) {
 		try {
 			var conf = fs.readFileSync(this.config_file, { encoding: 'utf8' });
@@ -112,10 +118,10 @@ NickApp.prototype.loadConfig = function() {
 		this.config = this.defaultConfig;
 	}
 }
-NickApp.prototype.saveConfig = function() {
+NickApp.prototype.saveConfig = function () {
 	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, '\t'), { encoding: 'utf8' });
 }
-NickApp.prototype.setActiveTab = function(serverHostname, channelName, elem) {
+NickApp.prototype.setActiveTab = function (serverHostname, channelName, elem) {
 	if (elem.dataset.serverHostname != serverHostname) {
 		elem.classList.remove('active');
 		return;
@@ -126,12 +132,12 @@ NickApp.prototype.setActiveTab = function(serverHostname, channelName, elem) {
 	}
 	elem.classList.add('active');
 }
-NickApp.prototype.showTab = function(serverHostname, channelName) {
+NickApp.prototype.showTab = function (serverHostname, channelName) {
 	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(null, serverHostname, channelName));
 	Array.prototype.forEach.call(this.elems.irc_tabs_contents.children, this.setActiveTab.bind(null, serverHostname, channelName));
 	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(null, serverHostname, channelName));
 }
-NickApp.prototype.onContentInputKeyUp = function(server, target, event) {
+NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
 	// console.dir(event);
 
 	if (event.which === 13) {
@@ -146,10 +152,21 @@ NickApp.prototype.onContentInputKeyUp = function(server, target, event) {
 		}
 	}
 }
+NickApp.prototype.processMessageContent = function (li) {
+	console.dir(li);
+
+	li.innerHTML = li.innerHTML.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/i, function(match, url) {
+		console.dir(arguments);
+		return url.link(url).replace(/<a href/, "<a onclick=\"app.openExternalLink(this.href); return false;\" href");
+	});
+}
+NickApp.prototype.openExternalLink = function (href) {
+	gui.Shell.openExternal(href);
+}
 
 
 
-NickApp.Server = function(app, hostname, nickname, channels_names) {
+NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.app = app;
 
 	this.hostname = hostname;
@@ -293,6 +310,10 @@ NickApp.Channel = function (app, name, server) {
 	this.tab_content.dataset.channelName = this.name;
 	this.app.elems.irc_tabs_contents.appendChild(this.tab_content);
 
+	this.tab_content_topic = document.createElement("h1");
+	this.tab_content_topic.className = "irc-tab-content-topic";
+	this.tab_content.appendChild(this.tab_content_topic);
+
 	this.tab_content_list = document.createElement("ol");
 	this.tab_content_list.className = "irc-tab-content-list";
 	this.tab_content_list.reversed = true;
@@ -318,7 +339,7 @@ NickApp.Channel = function (app, name, server) {
 	}
 	return this;
 }
-NickApp.Channel.prototype.mentionRegexp = function(nickname) {
+NickApp.Channel.prototype.mentionRegexp = function (nickname) {
 	return new RegExp("(\\b)"+nickname+"(\\b)", "i");
 }
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
@@ -351,6 +372,8 @@ NickApp.Channel.prototype.onPublicMessage = function (nickname, text, message) {
 	item.innerText = text;
 	item.dataset.author = nickname;
 	this.tab_content_list.appendChild(item);
+
+	this.app.processMessageContent(item);
 
 	this.tab_content.scrollTop = this.tab_content.scrollHeight;
 }
@@ -439,6 +462,8 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 	console.log("topic : ", arguments);
 
+	this.tab_content_topic.textContent = topic;
+	
 	var item = document.createElement("li");
 	item.className = "channel-topic";
 	item.innerText = "Topic is now " + topic;
@@ -448,7 +473,7 @@ NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 	this.tab_content.scrollTop = this.tab_content.scrollHeight;
 }
 
-NickApp.User = function(app, name, role) {
+NickApp.User = function (app, name, role) {
 	this.app = app;
 
 	this.name = name;
