@@ -2,6 +2,7 @@
 	"name": "Nick",
 	"title": "Nick — IRC Client",
 	"description": "Un client IRC simple et ergonomique",
+	"repository": "https://github.com/viki53/Nick",
 	"main": "html/index.html",
 	"window": {
 		"width": 800,

@@ -12,20 +12,15 @@ Cette application est basée sur [node-webkit](https://github.com/rogerwang/node
 
 ### Configuration nécessaire
 
-* Mac OS X 10.8+ (les autres plateformes n'ont pas été testées)
+* Mac OS X, Windows ou Linux
 * Node Webkit
 
-### Sous OS X
-
-En admettant que vous soyez déjà dans le dossier du projet :
+### Installer les dépendances
 
 ```
 npm install
-/Applications/node-webkit.app/Contents/MacOS/node-webkit ./
 ```
 
-Les chemins sont bien entendu à adapter en fonction de votre configuration
+### Lancer l'application
 
-### Autres plateformes
-
-Les autres plateformes n'ont pas encore été testées mais ll devrait être possible de tester sous Windows ainsi que Linux.
+Retrouvez les détails pour lancer le client de différentes façons sur [le Wiki de Noe-WebKit](https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps).
