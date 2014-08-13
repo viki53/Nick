@@ -359,6 +359,8 @@ NickApp.Channel.prototype.onChannelJoined = function (nickname) {
 	this.server.client.addListener("message" + this.name, this.onPublicMessage.bind(this));
 
 	this.server.client.addListener("join" + this.name, this.onUserJoin.bind(this));
+
+	this.server.client.addListener("part" + this.name, this.onUserQuit.bind(this));
 }
 NickApp.Channel.prototype.onPublicMessage = function (nickname, text, message) {
 	console.log("message : ", arguments);
@@ -440,11 +442,13 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 	console.log("quit : ", arguments);
 
 	var user = this.app.filter(this.users, { name: nickname }, true);
+	console.dir(user);
 	if (!user) {
 		return false;
 	}
 
-	var index = this.users.indexOf(user[0]);
+	var index = this.users.indexOf(user);
+	console.dir(index);
 	if (index === -1) {
 		return false;
 	}
@@ -455,7 +459,7 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 	item.className = "user-quit";
 	item.innerText = nickname + " has quit";
 	if (reason) {
-		item.innerText += " (" + reason + ")";
+		item.innerText += " : " + reason;
 	}
 	item.dataset.author = nickname;
 	this.tab_content_list.appendChild(item);
