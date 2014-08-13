@@ -83,8 +83,34 @@ body{
 	bottom: 2em;
 }
 .irc-tab-content-list>li{
-	padding: .25em .5em;
+	position: relative;
+	padding: .25em .5em .25em 9.5em;
 	white-space: pre-wrap;
+}
+.irc-tab-content-list>li:nth-last-child(2n+1){
+	background-color: #f9f9f9;
+}
+.irc-tab-content-list>li::before{
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: .25em .5em;
+	width: 8em;
+	text-align: right;
+	vertical-align: top;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.irc-tab-content-list>li.public-message::before,
+.irc-tab-content-list>li.private-message::before{
+	content: attr(data-author);
+}
+.irc-tab-content-list>li.channel-topic,
+.irc-tab-content-list>li.user-join,
+.irc-tab-content-list>li.user-quit{
+	font-style: italic;
 }
 .irc-tab-content-input{
 	display: block;
@@ -137,6 +163,6 @@ body{
 	cursor: pointer;
 }
 .irc-tab-users>li[data-user-role]::before{
-	content: "(" attr(data-user-role) ") ";
+	content: attr(data-user-role) " ";
 	color: #5677fc;
 }

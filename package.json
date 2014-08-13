@@ -4,8 +4,8 @@
 	"description": "Un client IRC simple et ergonomique",
 	"main": "html/index.html",
 	"window": {
-		"width": 600,
-		"height": 400,
+		"width": 800,
+		"height": 600,
 		"position": "center",
 		"toolbar": false,
 		"frame": true,

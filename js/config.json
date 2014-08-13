@@ -1,10 +1,10 @@
 {
-	"nickname": "viki53_Nick",
+	"nickname": "Nick",
 	"servers": [
 		{
 			"hostname": "irc.smoothirc.net",
 			"channels": [
-				"#zestedesavoir"
+				"#nick_tests"
 			]
 		}
 	]
