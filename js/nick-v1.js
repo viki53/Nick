@@ -30,7 +30,14 @@ NickApp = function () {
 
 	this.main_window = gui.Window.get();
 
-	this.main_window.menu = new gui.Menu({ type: 'menubar' });
+	var nativeMenubar = new gui.Menu({ type: 'menubar' });
+	
+	try {
+		nativeMenubar.createMacBuiltin("Nick");
+		this.main_window.menu = nativeMenubar;
+	} catch (ex) {
+		console.log(ex.message);
+	}
 
 	this.main_window.showDevTools();
 	this.main_window.focus();
