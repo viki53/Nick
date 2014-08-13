@@ -378,6 +378,8 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 
 	var user = new NickApp.User(this.app, nickname);
 
+	this.users.push(user);
+
 	var item = document.createElement("li");
 	item.className = "user-join";
 	item.innerText = nickname + " joined ";
