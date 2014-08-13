@@ -32,6 +32,8 @@ NickApp = function () {
 	this.main_window.showDevTools();
 	this.main_window.focus();
 
+	// gui.Shell.openExternal("http://website.com") // Ouvre une fenêtre externe (pratique pour les liens)
+
 	this.main_window.on('closed', this.onWindowClose.bind(this));
 }
 NickApp.prototype.onWindowClose = function() {
@@ -70,25 +72,23 @@ NickApp.prototype.defaultConfig = {
 	]
 }
 NickApp.prototype.colors = [
-	"#e51c23",
-	"#e91e63",
-	"#9c27b0",
-	"#673ab7",
-	"#3f51b5",
-	"#5677fc",
-	"#03a9f4",
-	"#00bcd4",
-	"#009688",
-	"#259b24",
-	"#8bc34a",
-	// "#cddc39",
-	// "#ffeb3b",
-	"#ffc107",
-	"#ff9800",
-	"#ff5722",
-	"#795548",
-	"#9e9e9e",
-	"#607d8b"
+	"#c41411",
+	"#ad1457",
+	"#6a1b9a",
+	"#4527a0",
+	"#283593",
+	"#3b50ce",
+	"#0277bd",
+	"#00838f",
+	"#00695c",
+	"#056f00",
+	"#558b2f",
+	"#9e9d24",
+	"#f9a825",
+	"#ff8f00",
+	"#ef6c00",
+	"#d84315",
+	"#4e342e"
 ]
 NickApp.prototype.loadConfig = function() {
 	if (fs.existsSync(this.config_file)) {
