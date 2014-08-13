@@ -11,6 +11,7 @@ NickApp = function () {
 	}
 
 	this.config_file = 'js/config.json';
+	// this.config_file = 'js/config-test.json';
 
 	this.config = {};
 
