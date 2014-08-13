@@ -1,0 +1,70 @@
+
+html{
+	background-color: #fff;
+	font-family: Roboto, sans-serif;
+}
+
+body{
+	margin: 0;
+}
+
+.page{
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+#irc-tabs{
+	box-sizing: border-box;
+	display: table-row;
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
+	height: 2em;
+	list-style: none;
+	border-top: 1px solid #ccc;
+}
+#irc-tabs>li{
+	box-sizing: border-box;
+	display: table-cell;
+	margin: 0;
+	padding: .5em;
+	height: 1em;
+	line-height: 1;
+	border-right: 1px solid #ccc;
+}
+
+#irc-tabs-contents{
+	position: fixed;
+	right: 10em;
+	bottom: 2em;
+	left: 0;
+}
+.irc-tab-content{
+	padding: .5em;
+	overflow-y: auto;
+}
+
+#irc-tabs-users{
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 2em;
+	width: 10em;
+	border-left: 1px solid #ccc;
+}
+.irc-tab-users{
+	box-sizing: border-box;
+	margin: 0;
+	padding: .5em;
+	width: 10em;
+	list-style: none;
+}
+.irc-tab-users>li[data-user-type]::before{
+	content: attr(data-user-type) " ";
+}
