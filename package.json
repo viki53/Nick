@@ -7,7 +7,7 @@
 		"width": 600,
 		"height": 400,
 		"position": "center",
-		"toolbar": true,
+		"toolbar": false,
 		"frame": true,
 		"icon": "img/logo-72x72.png"
 	},

@@ -39,7 +39,6 @@ app.loadConfig = function() {
 		try {
 			var conf = fs.readFileSync(app.config_file, { encoding: 'utf8' });
 
-			console.dir(conf);
 			if (!conf) {
 				app.config = app.defaultConfig;
 				return;
@@ -99,15 +98,21 @@ app.config.servers.forEach(function(server){
 	content.className = "irc-tab-content";
 	content.dataset.serverHostname = server.hostname;
 	app.elems.irc_tabs_contents.appendChild(content);
+	
+	app.showTab(server.hostname, null);
 
 	client.addListener("registered", function(message) {
-		app.showTab(server.hostname, null);
+		console.log("registered : ", arguments);
+
+		var welcome_message = document.createElement("p");
+		welcome_message.textContent = message.args[1];
+		content.appendChild(welcome_message);
+
+		server.temp_nickname = message.args[0];
 
 		server.channels.forEach(function(channel) {
 			client.join(channel, function(nickname) {
 				console.log("joined channel : ", arguments);
-
-				server.temp_nickname = nickname;
 
 				var tab = document.createElement("li");
 				tab.textContent = channel;
