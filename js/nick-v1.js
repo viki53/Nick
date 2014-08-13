@@ -1,3 +1,4 @@
+var fs = require("fs");
 var irc = require("irc");
 var gui = require('nw.gui');
 
@@ -10,15 +11,57 @@ app.elems = {
 	irc_tabs_users: document.getElementById("irc-tabs-users")
 }
 
-app.servers = [
-	{
-		hostname: "irc.smoothirc.net",
-		nickname: "Nick",
-		channels: [
-			"#nick_tests"
-		]
+
+app.config_file = 'js/config.json';
+
+app.config = {};
+
+app.defaultConfig = {
+	nickname: "user" + Date.now(),
+	servers: [
+		{
+			hostname: "irc.smoothirc.net",
+			channels: [
+				"#nick_tests"
+			]
+		}
+	]
+};
+
+app.init = function () {
+	app.loadConfig();
+
+	app.saveConfig();
+}
+
+app.loadConfig = function() {
+	if (fs.existsSync(app.config_file)) {
+		try {
+			var conf = fs.readFileSync(app.config_file, { encoding: 'utf8' });
+
+			console.dir(conf);
+			if (!conf) {
+				app.config = app.defaultConfig;
+				return;
+			}
+
+			app.config = JSON.parse(conf) || app.defaultConfig;;
+		}
+		catch(e) {
+			console.error(e);
+			return false;
+		}
 	}
-];
+	else {
+		app.config = app.defaultConfig;
+	}
+}
+
+app.saveConfig = function() {
+	return fs.writeFileSync(app.config_file, JSON.stringify(app.config, null, '\t'), { encoding: 'utf8' });
+}
+
+app.init();
 
 app.setActiveTab = function(serverHostname, channel, elem) {
 	if (elem.dataset.serverHostname != serverHostname) {
@@ -36,15 +79,10 @@ app.showTab = function(serverHostname, channel) {
 	Array.prototype.forEach.call(app.elems.irc_tabs_contents.children, app.setActiveTab.bind(null, serverHostname, channel));
 	Array.prototype.forEach.call(app.elems.irc_tabs_users.children, app.setActiveTab.bind(null, serverHostname, channel));
 }
-app.onClientRegistered = function() {
-	console.log("registered : ", arguments);
 
-	li.textContent = message.server;
-}
-
-app.servers.forEach(function(server){
+app.config.servers.forEach(function(server){
 	try{
-		var client = new irc.Client(server.hostname, server.nickname);
+		var client = new irc.Client(server.hostname, server.nickname || app.config.nickname);
 	}
 	catch(e) {
 		console.error(e);
@@ -66,8 +104,10 @@ app.servers.forEach(function(server){
 		app.showTab(server.hostname, null);
 
 		server.channels.forEach(function(channel) {
-			client.join(channel, function() {
+			client.join(channel, function(nickname) {
 				console.log("joined channel : ", arguments);
+
+				server.temp_nickname = nickname;
 
 				var tab = document.createElement("li");
 				tab.textContent = channel;
@@ -118,6 +158,9 @@ app.servers.forEach(function(server){
 						user_li.textContent = nickname;
 						user_li.dataset.userType = nicks[nickname];
 
+						if (nickname == server.temp_nickname) {
+							user_li.classList.add("me");
+						}
 						// ~	: Owner
 						// @	: OP
 						// &	: Admin

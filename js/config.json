@@ -1,0 +1,11 @@
+{
+	"nickname": "viki53",
+	"servers": [
+		{
+			"hostname": "irc.smoothirc.net",
+			"channels": [
+				"#nick_tests"
+			]
+		}
+	]
+}
