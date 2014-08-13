@@ -142,6 +142,13 @@ NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
 
 	if (event.which === 13) {
 		if (this.value.trim()) {
+
+			if (this.value.match(/^\/join/)) {
+				server.joinNewChannel(this.value.substring(5).trim());
+				this.value = "";
+				return;
+			}
+
 			server.client.say(target.name, this.value);
 
 			if (target.onPublicMessage) {
@@ -463,7 +470,7 @@ NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 	console.log("topic : ", arguments);
 
 	this.tab_content_topic.textContent = topic;
-	
+
 	var item = document.createElement("li");
 	item.className = "channel-topic";
 	item.innerText = "Topic is now " + topic;

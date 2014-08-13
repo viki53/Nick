@@ -103,7 +103,7 @@ a:hover{
 	list-style: none;
 }
 .irc-tab-content-topic+.irc-tab-content-list{
-	top: 2em;
+	margin-top: 2em;
 }
 .irc-tab-content-list:not(:last-child){
 	bottom: 2em;
