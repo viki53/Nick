@@ -131,7 +131,7 @@ NickApp.prototype.showTab = function(serverHostname, channelName) {
 	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(null, serverHostname, channelName));
 }
 NickApp.prototype.onContentInputKeyUp = function(server, target, event) {
-	console.dir(event);
+	// console.dir(event);
 
 	if (event.which === 13) {
 		if (this.value.trim()) {
