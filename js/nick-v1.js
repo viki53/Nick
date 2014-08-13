@@ -23,8 +23,6 @@ NickApp = function () {
 
 	this.config.servers.forEach(function(serv) {
 		var server = new NickApp.Server(this, serv.hostname, serv.nickname || this.config.nickname, serv.channels);
-
-		console.dir(this);
 		this.servers.push(server);
 	}, this);
 
@@ -262,7 +260,7 @@ NickApp.Server.prototype.onPrivateMessage = function (from, message) {
 NickApp.Server.prototype.onNicksReceive = function (channel_name, nicks) {
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
 	if (!channel) {
-		console.error("Channel not found : " + channel_name);
+		console.error("Channel not found: " + channel_name);
 		return false;
 	}
 	console.log(channel.constructor.name);
@@ -295,7 +293,7 @@ NickApp.Server.prototype.onChannelTopic = function (channel_name, topic, nick, m
 
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
 	if (!channel) {
-		console.error("Channel not found : " + channel_name);
+		console.error("Channel not found: " + channel_name);
 		return false;
 	}
 	
@@ -466,7 +464,7 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 	item.className = "user-quit";
 	item.innerText = nickname + " has quit";
 	if (reason) {
-		item.innerText += " : " + reason;
+		item.innerText += ": " + reason;
 	}
 	item.dataset.author = nickname;
 	this.tab_content_list.appendChild(item);

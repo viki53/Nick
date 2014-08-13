@@ -187,8 +187,11 @@ a:hover{
 .irc-tab-users>li{
 	padding: 0 .5em;
 }
+.irc-tab-users>li:hover{
+	background-color: #f9f9f9;
+}
 .irc-tab-users>li.me{
-	background-color: #fff;
+	font-style: italic;
 }
 .irc-tab-users>li:not(.me){
 	cursor: pointer;
