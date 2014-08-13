@@ -176,19 +176,11 @@ NickApp.Server = function(app, hostname, nickname, channels_names) {
 	
 	this.app.showTab(this.hostname, null);
 
-	server = this;
-
-	this.channels_names.forEach(function(name) {
-		var channel = new NickApp.Channel(this.app, name, this);
-		this.channels.push(channel);
-	}, this);
-
 	this.client.addListener("registered", this.onClientRegistered.bind(this));
 
 	return this;
 }
 NickApp.Server.prototype.onClientRegistered = function (message) {
-	console.log(this.constructor.name);
 	console.log("registered : ", arguments);
 
 	var welcome_message = document.createElement("li");
@@ -196,10 +188,6 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 	this.tab_content_list.appendChild(welcome_message);
 
 	this.temp_nickname = message.args[0];
-
-	this.channels.forEach(function(channel) {
-		this.client.join(channel.name, channel.onChannelJoined.bind(channel));
-	}, this);
 
 	this.client.addListener("names", this.onNicksReceive.bind(this));
 
@@ -213,7 +201,17 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 
 	this.client.addListener("quit", this.onUserQuit.bind(this));
 
+	this.channels_names.forEach(this.joinNewChannel, this);
+
 	// this.client.send("NICK", "Nick_tests_changed");
+}
+NickApp.Server.prototype.joinNewChannel = function (name) {
+	if (!name) {
+		name = prompt("Nom du channel à rejoindre", "#zestedesavoir");
+	}
+
+	var channel = new NickApp.Channel(this.app, name, this);
+	this.channels.push(channel);
 }
 NickApp.Server.prototype.onClientError = function (message) {
 	console.log("error : ", message);
@@ -311,10 +309,16 @@ NickApp.Channel = function (app, name, server) {
 	this.tab_users_list.dataset.channelName = this.name;
 	this.app.elems.irc_tabs_users.appendChild(this.tab_users_list);
 
-	var channel = this;
-
-
+	try{
+		this.server.client.join(this.name, this.onChannelJoined.bind(this));
+	}
+	catch(e){
+		console.error(e);
+	}
 	return this;
+}
+NickApp.Channel.prototype.mentionRegexp = function(nickname) {
+	return new RegExp("(\\b)"+nickname+"(\\b)", "i");
 }
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
 	console.log("joined channel : ", arguments);
@@ -337,6 +341,11 @@ NickApp.Channel.prototype.onPublicMessage = function (nickname, text, message) {
 
 	var item = document.createElement("li");
 	item.className = "public-message";
+	if (text.match(this.mentionRegexp(this.server.temp_nickname))) {
+		item.classList.add("mentioned");
+
+		this.app.main_window.requestAttention(true);
+	}
 	item.style.color = user.color;
 	item.innerText = text;
 	item.dataset.author = nickname;
