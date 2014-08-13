@@ -1,66 +1,141 @@
 var irc = require("irc");
-
+var gui = require('nw.gui');
 
 var app = {};
 
+app.elems = {
+	page_irc: document.getElementById("page-irc"),
+	irc_tabs: document.getElementById("irc-tabs"),
+	irc_tabs_contents: document.getElementById("irc-tabs-contents"),
+	irc_tabs_users: document.getElementById("irc-tabs-users")
+}
 
-app.client = new irc.Client("irc.smoothirc.net", "Nick", {
-	channels: [
-		// "#zestedesavoir",
-		"#nick_tests",
-	]
-});
+app.servers = [
+	{
+		hostname: "irc.smoothirc.net",
+		nickname: "Nick",
+		channels: [
+			"#nick_tests"
+		]
+	}
+];
 
-app.tabs = [];
+app.onClientRegistered = function() {
+	console.log("registered : ", arguments);
 
-app.client.addListener("message#", function (from, to, message) {
-	console.log("message : ", arguments);
+	li.textContent = message.server;
+}
 
-	var p = document.createElement("p");
-	p.innerText = from + " (" + to + ") : " + message;
-	document.body.appendChild(p);
+app.servers.forEach(function(server){
+	try{
+		var client = new irc.Client(server.hostname, server.nickname);
+	}
+	catch(e) {
+		console.error(e);
+		return;
+	}
 
-	document.body.scrollTop = document.body.scrollHeight;
-});
+	var tab = document.createElement("li");
+	tab.textContent = server.hostname;
+	tab.dataset.serverHostname = server.hostname;
+	app.elems.irc_tabs.appendChild(tab);
 
-app.client.addListener("pm", function (from, message) {
-	console.log("pm : ", arguments);
+	var content = document.createElement("div");
+	content.className = "irc-tab-content";
+	content.dataset.serverHostname = server.hostname;
+	app.elems.irc_tabs_contents.appendChild(content);
 
-	var p = document.createElement("p");
-	p.innerText = from + " : " + message;
-	document.body.appendChild(p);
+	client.addListener("registered", function(message) {
 
-	document.body.scrollTop = document.body.scrollHeight;
-});
+		server.channels.forEach(function(channel) {
+			client.join(channel, function() {
+				console.log("joined channel : ", arguments);
 
-app.client.addListener("names", function (channel, nicks) {
-	console.log("names : ", arguments);
-});
+				var tab = document.createElement("li");
+				tab.textContent = channel;
+				tab.dataset.serverHostname = server.hostname;
+				tab.dataset.channel = channel;
+				app.elems.irc_tabs.appendChild(tab);
 
-app.client.addListener("nick", function (oldnick, newnick, channels, message) {
-	console.log("nick : ", arguments);
+				var content = document.createElement("div");
+				content.className = "irc-tab-content";
+				content.dataset.serverHostname = server.hostname;
+				content.dataset.channel = channel;
+				app.elems.irc_tabs_contents.appendChild(content);
 
-	var p = document.createElement("p");
-	p.innerText = oldnick + " will now be called " + newnick;
-	document.body.appendChild(p);
+				var users_list = document.createElement("ul");
+				users_list.className = "irc-tab-users";
+				users_list.dataset.serverHostname = server.hostname;
+				users_list.dataset.channel = channel;
+				app.elems.irc_tabs_users.appendChild(users_list);
 
-	document.body.scrollTop = document.body.scrollHeight;
-});
+				client.addListener("message" + channel, function (nickname, text, message) {
+					console.log("message : ", arguments);
 
-app.client.addListener("join", function (channel, nick, message) {
-	console.log("join : ", arguments);
+					var p = document.createElement("p");
+					p.innerText = nickname + " : " + text;
+					content.appendChild(p);
 
-	var p = document.createElement("p");
-	p.innerText = nick + " joined " + channel;
-	document.body.appendChild(p);
+					content.scrollTop = content.scrollHeight;
+				});
 
-	document.body.scrollTop = document.body.scrollHeight;
-});
+				client.addListener("join" + channel, function (nickname, message) {
+					console.log("join : ", arguments);
 
-app.client.addListener("error", function(message) {
-	console.log("error : ", message);
+					var p = document.createElement("p");
+					p.innerText = nickname + " joined ";
+					content.appendChild(p);
+
+					content.scrollTop = content.scrollHeight;
+				});
+
+				client.addListener("names", function (channel, nicks) {
+					console.log("names : ", arguments);
+
+					for (var nickname in nicks) {
+						var user_li = document.createElement("li");
+						user_li.textContent = nickname;
+						user_li.dataset.userType = nicks[nickname];
+
+						// ~	: Owner
+						// @	: OP
+						// &	: Admin
+						// %	: HOP
+						// +	: Voice
+						users_list.appendChild(user_li);
+					}
+				});
+			});
+		})
+
+		client.addListener("pm", function (from, message) {
+			console.log("pm : ", arguments);
+
+			var p = document.createElement("p");
+			p.innerText = from + " : " + message;
+			content.appendChild(p);
+
+			content.scrollTop = content.scrollHeight;
+		});
+
+		client.addListener("nick", function (oldnickname, newnickname, channels, message) {
+			console.log("nick : ", arguments);
+
+			var p = document.createElement("p");
+			p.innerText = oldnickname + " will now be called " + newnickname;
+			content.appendChild(p);
+
+			content.scrollTop = content.scrollHeight;
+		});
+
+		client.addListener("error", function(message) {
+			console.log("error : ", message);
+		});
+
+		// client.send("NICK", "Nick_tests_changed");
+	});
 });
 
 console.dir(irc.colors.codes);
 
-app.client.send("NICK", "Nick_tests_changed");
+gui.Window.get().showDevTools();
