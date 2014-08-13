@@ -20,6 +20,22 @@ app.servers = [
 	}
 ];
 
+app.setActiveTab = function(serverHostname, channel, elem) {
+	if (elem.dataset.serverHostname != serverHostname) {
+		elem.classList.remove('active');
+		return;
+	}
+	if ((channel && elem.dataset.channel != channel) || (!channel && elem.dataset.channel)) {
+		elem.classList.remove('active');
+		return;
+	}
+	elem.classList.add('active');
+}
+app.showTab = function(serverHostname, channel) {
+	Array.prototype.forEach.call(app.elems.irc_tabs.children, app.setActiveTab.bind(null, serverHostname, channel));
+	Array.prototype.forEach.call(app.elems.irc_tabs_contents.children, app.setActiveTab.bind(null, serverHostname, channel));
+	Array.prototype.forEach.call(app.elems.irc_tabs_users.children, app.setActiveTab.bind(null, serverHostname, channel));
+}
 app.onClientRegistered = function() {
 	console.log("registered : ", arguments);
 
@@ -38,6 +54,7 @@ app.servers.forEach(function(server){
 	var tab = document.createElement("li");
 	tab.textContent = server.hostname;
 	tab.dataset.serverHostname = server.hostname;
+	tab.addEventListener("click", app.showTab.bind(tab, server.hostname, null), false);
 	app.elems.irc_tabs.appendChild(tab);
 
 	var content = document.createElement("div");
@@ -46,6 +63,7 @@ app.servers.forEach(function(server){
 	app.elems.irc_tabs_contents.appendChild(content);
 
 	client.addListener("registered", function(message) {
+		app.showTab(server.hostname, null);
 
 		server.channels.forEach(function(channel) {
 			client.join(channel, function() {
@@ -55,6 +73,7 @@ app.servers.forEach(function(server){
 				tab.textContent = channel;
 				tab.dataset.serverHostname = server.hostname;
 				tab.dataset.channel = channel;
+				tab.addEventListener("click", app.showTab.bind(tab, server.hostname, channel), false);
 				app.elems.irc_tabs.appendChild(tab);
 
 				var content = document.createElement("div");
@@ -68,6 +87,8 @@ app.servers.forEach(function(server){
 				users_list.dataset.serverHostname = server.hostname;
 				users_list.dataset.channel = channel;
 				app.elems.irc_tabs_users.appendChild(users_list);
+
+				app.showTab(server.hostname, channel);
 
 				client.addListener("message" + channel, function (nickname, text, message) {
 					console.log("message : ", arguments);

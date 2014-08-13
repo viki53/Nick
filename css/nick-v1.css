@@ -38,6 +38,9 @@ body{
 	line-height: 1;
 	border-right: 1px solid #ccc;
 }
+#irc-tabs>li.active{
+	background-color: #f5f5f5;
+}
 
 #irc-tabs-contents{
 	position: fixed;
@@ -46,8 +49,12 @@ body{
 	left: 0;
 }
 .irc-tab-content{
+	display: none;
 	padding: .5em;
 	overflow-y: auto;
+}
+.irc-tab-content.active{
+	display: block;
 }
 
 #irc-tabs-users{
@@ -59,11 +66,15 @@ body{
 	border-left: 1px solid #ccc;
 }
 .irc-tab-users{
+	display: none;
 	box-sizing: border-box;
 	margin: 0;
 	padding: .5em;
 	width: 10em;
 	list-style: none;
+}
+.irc-tab-users.active{
+	display: block;
 }
 .irc-tab-users>li[data-user-type]::before{
 	content: attr(data-user-type) " ";
