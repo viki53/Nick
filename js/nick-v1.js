@@ -428,6 +428,11 @@ NickApp.Channel.prototype.destroy = function () {
 NickApp.Channel.prototype.mentionRegexp = function (nickname) {
 	return new RegExp("(\\b)"+nickname+"(\\b)", "i");
 }
+NickApp.Channel.prototype.insertNicknameToInput = function (nickname) {
+	this.tab_content_input.value += nickname;
+
+	this.tab_content_input.focus();
+}
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
 	// console.log("joined channel : ", arguments);
 
@@ -500,6 +505,7 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 		}
 		else {
 			user_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null), false);
+			user_li.addEventListener("click", this.insertNicknameToInput.bind(this, user.name));
 		}
 
 		this.users.push(user);
@@ -530,6 +536,7 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 		user_li.dataset.userRole = user.role;
 	}
 	user_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null));
+	user_li.addEventListener("click", this.insertNicknameToInput.bind(this, user.name));
 	this.tab_users_list.appendChild(user_li);
 }
 NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
@@ -699,7 +706,7 @@ NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, messag
 	if (!this.tab.classList.contains("active")) {
 		this.tab.classList.add("has-unread");
 	}
-	
+
 	this.app.main_window.requestAttention(true);
 
 	return this;
