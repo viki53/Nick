@@ -199,6 +199,7 @@ a:hover{
 }
 
 #irc-tabs-users{
+	box-sizing: border-box;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -211,7 +212,6 @@ a:hover{
 .irc-tab-users,
 .irc-tab-channels{
 	display: none;
-	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
 	list-style: none;
