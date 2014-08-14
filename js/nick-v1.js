@@ -699,6 +699,8 @@ NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, messag
 	if (!this.tab.classList.contains("active")) {
 		this.tab.classList.add("has-unread");
 	}
+	
+	this.app.main_window.requestAttention(true);
 
 	return this;
 }
