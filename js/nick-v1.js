@@ -186,8 +186,8 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.app = app;
 
 	this.hostname = hostname;
-	this.client = new irc.Client(hostname, nickname || this.app.config.nickname);
 	this.temp_nickname = nickname || this.app.config.nickname;
+	this.client = new irc.Client(this.hostname, this.temp_nickname, { userName: this.temp_nickname, realName: this.temp_nickname + " (using Nick Client)" });
 
 	this.channels_names = channels_names;
 	this.channels = [];
@@ -196,7 +196,7 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.tab = document.createElement("li");
 	this.tab.textContent = this.hostname;
 	this.tab.dataset.serverHostname = this.hostname;
-	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.hostname, null), false);
+	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.hostname, null, null), false);
 	this.app.elems.irc_tabs.appendChild(this.tab);
 
 	this.tab_content = document.createElement("div");
@@ -209,7 +209,7 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.tab_content_list.reversed = true;
 	this.tab_content.appendChild(this.tab_content_list);
 	
-	this.app.showTab(this.hostname, null);
+	this.app.showTab(this.hostname, null, null);
 
 	this.client.addListener("registered", this.onClientRegistered.bind(this));
 
@@ -319,7 +319,7 @@ NickApp.Channel = function (app, name, server) {
 	this.tab.textContent = this.name;
 	this.tab.dataset.serverHostname = this.server.hostname;
 	this.tab.dataset.channelName = this.name;
-	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.server.hostname, this.name), false);
+	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.server.hostname, this.name, null), false);
 	this.app.elems.irc_tabs.appendChild(this.tab);
 
 	this.tab_content = document.createElement("div");
@@ -363,7 +363,7 @@ NickApp.Channel.prototype.mentionRegexp = function (nickname) {
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
 	// console.log("joined channel : ", arguments);
 
-	this.app.showTab(this.server.hostname, this.name);
+	this.app.showTab(this.server.hostname, this.name, null);
 
 	this.tab_content_input.focus();
 
