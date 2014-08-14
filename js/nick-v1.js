@@ -524,6 +524,7 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 
 	var user_li = document.createElement("li");
+	user_li.style.color = user.color;
 	user_li.textContent = user.name;
 	if (user.role) {
 		user_li.dataset.userRole = user.role;
@@ -683,10 +684,15 @@ NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, messag
 
 	var item = document.createElement("li");
 	item.className = "private-message";
+	if (nickname !== this.server.temp_nickname) {
+		item.style.color = this.user.color;
+	}
 	item.innerText = text;
 	item.dataset.author = nickname;
 	item.dataset.date = now.getFullYear().pad() + "-" + (now.getMonth() + 1).pad() + "-" + now.getDate().pad() + " " + (now.getHours() + 1).pad() + ":" + (now.getMinutes() + 1).pad() + ":" + (now.getSeconds() + 1).pad();
 	this.tab_content_list.appendChild(item);
+
+	this.app.processMessageContent(item);
 
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 
