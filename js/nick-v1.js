@@ -128,18 +128,21 @@ NickApp.prototype.saveConfig = function () {
 }
 NickApp.prototype.setActiveTab = function (serverHostname, channelName, userName, elem) {
 	if (elem.dataset.serverHostname != serverHostname) {
-		elem.classList.remove('active');
+		elem.classList.remove("active");
 		return;
 	}
 	if ((channelName && elem.dataset.channelName != channelName) || (!channelName && elem.dataset.channelName)) {
-		elem.classList.remove('active');
+		elem.classList.remove("active");
 		return;
 	}
 	if ((userName && elem.dataset.userName != userName) || (!userName && elem.dataset.userName)) {
-		elem.classList.remove('active');
+		elem.classList.remove("active");
 		return;
 	}
-	elem.classList.add('active');
+	elem.classList.add("active");
+	if (elem.parentNode.id === "irc-tabs") {
+		elem.classList.remove("has-unread");
+	}
 }
 NickApp.prototype.showTab = function (serverHostname, channelName, userName) {
 	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
@@ -398,6 +401,10 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 	this.app.processMessageContent(item);
 
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+
+	if (!this.tab.classList.contains("active")) {
+		this.tab.classList.add("has-unread");
+	}
 }
 NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 	// console.log("names : ", arguments);
@@ -582,6 +589,10 @@ NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, messag
 	this.tab_content_list.appendChild(item);
 
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+
+	if (!this.tab.classList.contains("active")) {
+		this.tab.classList.add("has-unread");
+	}
 
 	return this;
 }

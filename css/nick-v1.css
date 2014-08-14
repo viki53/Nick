@@ -63,6 +63,16 @@ a:hover{
 #irc-tabs>li:not(.active){
 	cursor: pointer;
 }
+#irc-tabs>li.has-unread{
+	-webkit-animation: tabHasUnread 1.5s infinite;
+	animation: tabHasUnread 1.5s infinite;
+}
+@-webkit-keyframes tabHasUnread{
+	50% { background-color: rgba(196, 20, 17, .2); }
+}
+@keyframes tabHasUnread{
+	50% { background-color: rgba(196, 20, 17, .2); }
+}
 
 #irc-tabs-contents{
 	position: fixed;
