@@ -153,19 +153,22 @@ NickApp.prototype.setActiveTab = function (serverHostname, channelName, userName
 	}
 }
 NickApp.prototype.showTab = function (serverHostname, channelName, userName) {
-	console.dir(arguments);
 	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(this, serverHostname, channelName, userName));
 	Array.prototype.forEach.call(this.elems.irc_tabs_contents.children, this.setActiveTab.bind(this, serverHostname, channelName, userName));
 	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(this, serverHostname, channelName, userName));
 }
 NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
-	// console.dir(event);
-
 	if (event.which === 13) {
 		if (this.value.trim()) {
 
 			if (this.value.match(/^\/join/)) {
 				server.joinNewChannel(this.value.substring(5).trim());
+				this.value = "";
+				return;
+			}
+			if (this.value.match(/^\/nick/)) {
+				server.client.send("NICK", this.value.substring(5).trim());
+
 				this.value = "";
 				return;
 			}
@@ -181,8 +184,6 @@ NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
 	}
 }
 NickApp.prototype.processMessageContent = function (li) {
-	console.dir(li);
-
 	li.innerHTML = li.innerHTML.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/i, function(match, url) {
 		console.dir(arguments);
 		return url.link(url).replace(/<a href/, "<a onclick=\"app.openExternalLink(this.href); return false;\" href");
@@ -233,8 +234,6 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	return this;
 }
 NickApp.Server.prototype.onClientRegistered = function (message) {
-	// console.log("registered : ", arguments);
-
 	var welcome_message = document.createElement("li");
 	welcome_message.textContent = message.args[1];
 	this.tab_content_list.appendChild(welcome_message);
@@ -247,7 +246,7 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 
 	this.client.addListener("pm", this.onPrivateMessage.bind(this));
 
-	this.client.addListener("nick", this.onNicksReceive.bind(this));
+	this.client.addListener("nick", this.onUserNickChange.bind(this));
 
 	this.client.addListener("error", this.onClientError.bind(this));
 
@@ -258,8 +257,6 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 	this.client.list();
 
 	this.channels_names.forEach(this.joinNewChannel, this);
-
-	// this.client.send("NICK", "Nick_tests_changed");
 }
 NickApp.Server.prototype.joinNewChannel = function (name) {
 	if (!name) {
@@ -273,8 +270,6 @@ NickApp.Server.prototype.onClientError = function (message) {
 	console.log("error : ", message);
 }
 NickApp.Server.prototype.onChannelsList = function (channels_list) {
-	console.log("channels_list : ", channels_list);
-
 	channels_list.forEach(function(chan) {
 		var channel_li = document.createElement("li");
 		channel_li.textContent = chan.name;
@@ -289,8 +284,6 @@ NickApp.Server.prototype.onChannelsList = function (channels_list) {
 	}, this);
 }
 NickApp.Server.prototype.onPrivateMessage = function (nickname, text, message) {
-	console.log("pm : ", arguments);
-
 	var discussion = this.app.filter(this.discussions, { name : nickname }, true);
 
 	if (!discussion) {
@@ -310,19 +303,18 @@ NickApp.Server.prototype.onNicksReceive = function (channel_name, nicks) {
 		console.error("Channel not found: " + channel_name);
 		return false;
 	}
-	console.log(channel.constructor.name);
 	channel.onNicksReceive(nicks);
 }
 NickApp.Server.prototype.onUserNickChange = function (oldnickname, newnickname, channels, message) {
-	// console.log("nick : ", arguments);
+	channels.forEach(function (channel_name) {
+		var channel = this.app.filter(this.channels, { name: channel_name }, true);
 
-	var item = document.createElement("li");
-	item.className = "user-nick-change";
-	item.innerText = oldnickname + " will now be called " + newnickname;
-	item.dataset.author = newnickname;
-	this.tab_content_list.appendChild(item);
+		if (!channel) {
+			return false;
+		}
 
-	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+		channel.onUserNickChange(oldnickname, newnickname, message);
+	}, this);
 }
 NickApp.Server.prototype.onUserQuit = function (nickname, reason, channels, message) {
 	channels.forEach(function (channel_name) {
@@ -336,8 +328,6 @@ NickApp.Server.prototype.onUserQuit = function (nickname, reason, channels, mess
 	}, this);
 }
 NickApp.Server.prototype.onChannelTopic = function (channel_name, topic, nick, message) {
-	// console.log("topic : ", arguments);
-
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
 	if (!channel) {
 		console.error("Channel not found: " + channel_name);
@@ -434,8 +424,6 @@ NickApp.Channel.prototype.insertNicknameToInput = function (nickname) {
 	this.tab_content_input.focus();
 }
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
-	// console.log("joined channel : ", arguments);
-
 	this.app.showTab(this.server.hostname, this.name, null);
 
 	this.tab_content_input.focus();
@@ -449,8 +437,6 @@ NickApp.Channel.prototype.onChannelJoined = function (nickname) {
 	this.server.client.addListener("kick" + this.name, this.onUserKick.bind(this));
 }
 NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
-	// console.log("message : ", arguments);
-
 	var user = this.app.filter(this.users, { name: nickname }, true);
 	if (!user) {
 		return false;
@@ -480,8 +466,6 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 	}
 }
 NickApp.Channel.prototype.onNicksReceive = function (nicks) {
-	// console.log("names : ", arguments);
-
 	for (var nickname in nicks) {
 		var user = new NickApp.User(this.app, nickname, nicks[nickname]);
 
@@ -514,8 +498,6 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 	}
 }
 NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
-	// console.log("join : ", arguments);
-
 	var user = new NickApp.User(this.app, nickname);
 
 	this.users.push(user);
@@ -539,9 +521,44 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 	user_li.addEventListener("click", this.insertNicknameToInput.bind(this, user.name));
 	this.tab_users_list.appendChild(user_li);
 }
-NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
-	// console.log("quit : ", arguments);
+NickApp.Channel.prototype.onUserNickChange = function (oldnickname, newnickname, message) {
+	var user = this.app.filter(this.users, { name: oldnickname }, true);
+	if (!user) {
+		console.error("User not found", oldnickname);
+		return false;
+	}
 
+	user.name = newnickname;
+
+	var item = document.createElement("li");
+	item.className = "user-nick-change";
+	item.style.color = user.color;
+	item.innerText = oldnickname + " will now be called " + newnickname;
+	item.dataset.author = newnickname;
+	this.tab_content_list.appendChild(item);
+
+	Array.prototype.forEach.call(this.tab_users_list.children, function(li) {
+		if (li.textContent != oldnickname) {
+			return false;
+		}
+		var new_li = li.cloneNode(true);
+		li.parentNode.replaceChild(new_li, li);
+
+		new_li.textContent = newnickname;
+
+		if (!new_li.classList.contains("me")) { 
+			new_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null));
+			new_li.addEventListener("click", this.insertNicknameToInput.bind(this, newnickname));
+		}
+		else {
+			this.server.temp_nickname = newnickname;
+			this.server.current_user.name = newnickname;
+		}
+	}, this);
+
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+}
+NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 	var user = this.app.filter(this.users, { name: nickname }, true);
 	if (!user) {
 		return false;
@@ -570,8 +587,6 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 	});
 }
 NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
-	// console.log("kick : ", arguments);
-
 	var user = this.app.filter(this.users, { name: nickname }, true);
 	if (!user) {
 		return false;
@@ -600,8 +615,6 @@ NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
 	});
 }
 NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
-	// console.log("topic : ", arguments);
-
 	this.tab_content_topic.textContent = topic;
 
 	var item = document.createElement("li");
