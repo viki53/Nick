@@ -2,10 +2,18 @@
 	"name": "Nick",
 	"title": "Nick — IRC Client",
 	"description": "Un client IRC simple et ergonomique",
-	"version": "0.1",
-	"repository": "https://github.com/viki53/Nick",
+	"version": "0.1.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/viki53/Nick"
+	},
 	"bugs": "https://github.com/viki53/Nick/issues",
 	"main": "html/index.html",
+	"author": {
+		"name": "Corentin Hatte",
+		"email": "contact@corentin-hatte.eu",
+		"web": "http://corentin-hatte.eu/"
+	},
 	"window": {
 		"width": 800,
 		"height": 600,
@@ -18,12 +26,5 @@
 	},
 	"dependencies": {
 		"irc": "0.3.*"
-	},
-	"maintainers": [
-		{
-			"name": "Corentin Hatte",
-			"email": "contact@corentin-hatte.eu",
-			"web": "http://corentin-hatte.eu/"
-		}
-	]
+	}
 }
