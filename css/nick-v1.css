@@ -81,8 +81,10 @@ a:hover{
 	height: 1em;
 	border-radius: .5em;
 	text-align: center;
+	opacity: .5;
 }
 #irc-tabs>li>.tab-close-button:hover{
+	opacity: 1;
 	background-color: #e0e0e0;
 	cursor: pointer;
 }
