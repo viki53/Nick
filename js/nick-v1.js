@@ -212,6 +212,11 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.tab_content_list.className = "irc-tab-content-list";
 	this.tab_content_list.reversed = true;
 	this.tab_content.appendChild(this.tab_content_list);
+
+	this.tab_channels_list = document.createElement("ul");
+	this.tab_channels_list.className = "irc-tab-channels";
+	this.tab_channels_list.dataset.serverHostname = this.hostname;
+	this.app.elems.irc_tabs_users.appendChild(this.tab_channels_list);
 	
 	this.app.showTab(this.hostname, null, null);
 
@@ -240,6 +245,10 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 
 	this.client.addListener("quit", this.onUserQuit.bind(this));
 
+	this.client.addListener("channellist", this.onChannelsList.bind(this));
+
+	this.client.list();
+
 	this.channels_names.forEach(this.joinNewChannel, this);
 
 	// this.client.send("NICK", "Nick_tests_changed");
@@ -254,6 +263,22 @@ NickApp.Server.prototype.joinNewChannel = function (name) {
 }
 NickApp.Server.prototype.onClientError = function (message) {
 	console.log("error : ", message);
+}
+NickApp.Server.prototype.onChannelsList = function (channels_list) {
+	console.log("channels_list : ", channels_list);
+
+	channels_list.forEach(function(chan) {
+		var channel_li = document.createElement("li");
+		channel_li.textContent = chan.name;
+		if (chan.topic) {
+			channel_li.title = chan.topic;
+		}
+		if (chan.users) {
+			channel_li.dataset.users_number = chan.users;
+		}
+		channel_li.addEventListener("dblclick", this.joinNewChannel.bind(this, chan.name), false);
+		this.tab_channels_list.appendChild(channel_li);
+	}, this);
 }
 NickApp.Server.prototype.onPrivateMessage = function (nickname, text, message) {
 	console.log("pm : ", arguments);
@@ -463,7 +488,7 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 			this.server.current_user = user;
 		}
 		else {
-			user_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null));
+			user_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null), false);
 		}
 
 		this.users.push(user);

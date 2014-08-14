@@ -199,7 +199,8 @@ a:hover{
 	background-color: #eeeeee;
 	border-left: 1px solid #e0e0e0;
 }
-.irc-tab-users{
+.irc-tab-users,
+.irc-tab-channels{
 	display: none;
 	box-sizing: border-box;
 	margin: 0;
@@ -207,22 +208,30 @@ a:hover{
 	width: 10em;
 	list-style: none;
 }
-.irc-tab-users.active{
+.irc-tab-users.active,
+.irc-tab-channels.active{
 	display: block;
 }
-.irc-tab-users>li{
+.irc-tab-users>li,
+.irc-tab-channels>li{
 	padding: 0 .5em;
 }
-.irc-tab-users>li:hover{
+.irc-tab-users>li:hover,
+.irc-tab-channels>li:hover{
 	background-color: #f9f9f9;
 }
 .irc-tab-users>li.me{
 	font-style: italic;
 }
-.irc-tab-users>li:not(.me){
+.irc-tab-users>li:not(.me),
+.irc-tab-channels>li{
 	cursor: pointer;
 }
 .irc-tab-users>li[data-user-role]::before{
 	content: attr(data-user-role) " ";
+	color: #5677fc;
+},
+.irc-tab-channels>li[data-users-number]::before{
+	content: attr(data-users-number) " ";
 	color: #5677fc;
 }
