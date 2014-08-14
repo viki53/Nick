@@ -56,6 +56,7 @@ a:hover{
 	height: 1em;
 	line-height: 1;
 	border-right: 1px solid #e0e0e0;
+	white-space: pre;
 }
 #irc-tabs>li.active{
 	background-color: #fff;
@@ -72,6 +73,18 @@ a:hover{
 }
 @keyframes tabHasUnread{
 	50% { background-color: rgba(196, 20, 17, .2); }
+}
+#irc-tabs>li>.tab-close-button{
+	display: inline-block;
+	margin-left: .25em;
+	width: 1em;
+	height: 1em;
+	border-radius: .5em;
+	text-align: center;
+}
+#irc-tabs>li>.tab-close-button:hover{
+	background-color: #e0e0e0;
+	cursor: pointer;
 }
 
 #irc-tabs-contents{
@@ -121,7 +134,7 @@ a:hover{
 }
 .irc-tab-content-list>li{
 	position: relative;
-	padding: .25em .5em .25em 9.5em;
+	padding: .25em .5em .25em 10.5em;
 	white-space: pre-wrap;
 }
 .irc-tab-content-list>li:hover{
@@ -133,7 +146,7 @@ a:hover{
 	top: 0;
 	left: 0;
 	padding: .25em .5em;
-	width: 8em;
+	width: 9em;
 	text-align: right;
 	vertical-align: top;
 	white-space: nowrap;

@@ -145,9 +145,10 @@ NickApp.prototype.setActiveTab = function (serverHostname, channelName, userName
 	}
 }
 NickApp.prototype.showTab = function (serverHostname, channelName, userName) {
-	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
-	Array.prototype.forEach.call(this.elems.irc_tabs_contents.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
-	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
+	console.dir(arguments);
+	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(this, serverHostname, channelName, userName));
+	Array.prototype.forEach.call(this.elems.irc_tabs_contents.children, this.setActiveTab.bind(this, serverHostname, channelName, userName));
+	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(this, serverHostname, channelName, userName));
 }
 NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
 	// console.dir(event);
@@ -263,8 +264,12 @@ NickApp.Server.prototype.onPrivateMessage = function (nickname, text, message) {
 		discussion = new NickApp.PrivateDiscussion(this.app, this, nickname);
 		this.discussions.push(discussion);
 	}
-
-	discussion.onMessage(nickname, text, message);
+	if (text) {
+		discussion.onMessage(nickname, text, message);
+	}
+	else {
+		this.app.showTab(this.hostname, null, nickname);
+	}
 }
 NickApp.Server.prototype.onNicksReceive = function (channel_name, nicks) {
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
@@ -325,6 +330,12 @@ NickApp.Channel = function (app, name, server) {
 	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.server.hostname, this.name, null), false);
 	this.app.elems.irc_tabs.appendChild(this.tab);
 
+	this.close_button = document.createElement("span");
+	this.close_button.className = "tab-close-button";
+	this.close_button.textContent = "×";
+	this.close_button.addEventListener("click", this.destroy.bind(this), false);
+	this.tab.appendChild(this.close_button);
+
 	this.tab_content = document.createElement("div");
 	this.tab_content.className = "irc-tab-content";
 	this.tab_content.dataset.serverHostname = this.server.hostname;
@@ -359,6 +370,27 @@ NickApp.Channel = function (app, name, server) {
 		console.error(e);
 	}
 	return this;
+}
+NickApp.Channel.prototype.destroy = function () {
+	this.server.client.part(this.name);
+
+	var index = this.server.channels.indexOf(this);
+
+	if (index !== -1) {
+		this.server.channels.splice(index, 1);
+	}
+
+	this.tab.parentNode.removeChild(this.tab);
+	this.tab_content.parentNode.removeChild(this.tab_content);
+	this.tab_users_list.parentNode.removeChild(this.tab_users_list);
+
+	this.app.showTab(this.server.hostname, null, null);
+
+	if (event) {
+		event.stopPropagation();
+	}
+
+	delete this;
 }
 NickApp.Channel.prototype.mentionRegexp = function (nickname) {
 	return new RegExp("(\\b)"+nickname+"(\\b)", "i");
@@ -418,6 +450,7 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 		if (user.role) {
 			user_li.dataset.userRole = user.role;
 		}
+		
 		// ~	: Owner
 		// @	: OP
 		// &	: Admin
@@ -428,6 +461,9 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 			user_li.classList.add("me");
 
 			this.server.current_user = user;
+		}
+		else {
+			user_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null));
 		}
 
 		this.users.push(user);
@@ -456,6 +492,7 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 	if (user.role) {
 		user_li.dataset.userRole = user.role;
 	}
+	user_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null));
 	this.tab_users_list.appendChild(user_li);
 }
 NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
@@ -562,6 +599,12 @@ NickApp.PrivateDiscussion = function (app, server, nickname) {
 	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.server.hostname, null, this.name), false);
 	this.app.elems.irc_tabs.appendChild(this.tab);
 
+	this.close_button = document.createElement("span");
+	this.close_button.className = "tab-close-button";
+	this.close_button.textContent = "×";
+	this.close_button.addEventListener("click", this.destroy.bind(this), false);
+	this.tab.appendChild(this.close_button);
+
 	this.tab_content = document.createElement("div");
 	this.tab_content.className = "irc-tab-content";
 	this.tab_content.dataset.serverHostname = this.server.hostname;
@@ -580,6 +623,24 @@ NickApp.PrivateDiscussion = function (app, server, nickname) {
 	this.tab_content.appendChild(this.tab_content_input);
 
 	return this;
+}
+NickApp.PrivateDiscussion.prototype.destroy = function (event) {
+	var index = this.server.discussions.indexOf(this);
+
+	if (index !== -1) {
+		this.server.discussions.splice(index, 1);
+	}
+
+	this.tab.parentNode.removeChild(this.tab);
+	this.tab_content.parentNode.removeChild(this.tab_content);
+
+	this.app.showTab(this.server.hostname, null, null);
+
+	if (event) {
+		event.stopPropagation();
+	}
+
+	delete this;
 }
 NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, message) {
 	var item = document.createElement("li");
