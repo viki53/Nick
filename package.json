@@ -2,12 +2,15 @@
 	"name": "Nick",
 	"title": "Nick — IRC Client",
 	"description": "Un client IRC simple et ergonomique",
+	"keywords": ["IRC", "client", "simple"],
 	"version": "0.1.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/viki53/Nick"
+		"url": "git@github.com:viki53/Nick.git"
 	},
-	"bugs": "https://github.com/viki53/Nick/issues",
+	"bugs": {
+		"url": "https://github.com/viki53/Nick/issues"
+	},
 	"main": "html/index.html",
 	"author": {
 		"name": "Corentin Hatte",
