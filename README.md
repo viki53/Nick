@@ -8,6 +8,12 @@ L'objectif est d'avoir un client IRC léger et ergonomique (parce qu'IRC c'est p
 
 Cette application est basée sur [node-webkit](https://github.com/rogerwang/node-webkit), qui est donc nécessaire pour la faire fonctionner.
 
+## Configurer l'application
+
+La configuration de base se gère dans le fichier `js/config.json` et vous permet de spécifier les serveurs auxquels se connecter au lancement, ainsi que les channels à rejoindre.
+
+Vous pouvez spécifier un nickname général (valable pour l'ensemble des serveurs), ainsi qu'un nickname pour chaque serveur (qui écrasera le nickname général).
+
 ## Lancer l'application
 
 ### Configuration nécessaire
