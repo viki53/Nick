@@ -139,19 +139,20 @@ a:hover{
 }
 .irc-tab-content-list>li{
 	position: relative;
-	padding: .25em .5em .25em 10.5em;
+	padding: .25em .5em .25em 11.5em;
 	white-space: pre-wrap;
 }
 .irc-tab-content-list>li:hover{
 	background-color: #f9f9f9;
 }
-.irc-tab-content-list>li::before{
+.irc-tab-content-list>li::before,
+.irc-tab-content-list>li:hover::after{
 	content: "";
 	position: absolute;
 	top: 0;
 	left: 0;
 	padding: .25em .5em;
-	width: 9em;
+	width: 10em;
 	text-align: right;
 	vertical-align: top;
 	white-space: nowrap;
@@ -161,6 +162,11 @@ a:hover{
 .irc-tab-content-list>li.public-message::before,
 .irc-tab-content-list>li.private-message::before{
 	content: attr(data-author);
+}
+.irc-tab-content-list>li.public-message:hover::after,
+.irc-tab-content-list>li.private-message:hover::after{
+	content: "[" attr(data-date) "]";
+	background-color: #f5f5f5;
 }
 .irc-tab-content-list>li.channel-topic,
 .irc-tab-content-list>li.user-join,
@@ -197,7 +203,7 @@ a:hover{
 	top: 0;
 	right: 0;
 	bottom: 2em;
-	width: 10em;
+	width: 11em;
 	overflow-y: auto;
 	background-color: #eeeeee;
 	border-left: 1px solid #e0e0e0;
@@ -208,7 +214,6 @@ a:hover{
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
-	width: 10em;
 	list-style: none;
 }
 .irc-tab-users.active,

@@ -2,6 +2,14 @@ var fs = require("fs");
 var irc = require("irc");
 var gui = require('nw.gui');
 
+
+Number.prototype.pad = function () {
+	if ( this < 10 ) {
+		return '0' + this;
+	}
+	return this;
+}
+
 NickApp = function () {
 	this.elems = {
 		page_irc: document.getElementById("page-irc"),
@@ -443,6 +451,8 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 		return false;
 	}
 
+	var now = new Date();
+
 	var item = document.createElement("li");
 	item.className = "public-message";
 	if (text.match(this.mentionRegexp(this.server.temp_nickname))) {
@@ -453,6 +463,7 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 	item.style.color = user.color;
 	item.innerText = text;
 	item.dataset.author = nickname;
+	item.dataset.date = now.getFullYear().pad() + "-" + (now.getMonth() + 1).pad() + "-" + now.getDate().pad() + " " + (now.getHours() + 1).pad() + ":" + (now.getMinutes() + 1).pad() + ":" + (now.getSeconds() + 1).pad();
 	this.tab_content_list.appendChild(item);
 
 	this.app.processMessageContent(item);
@@ -668,10 +679,13 @@ NickApp.PrivateDiscussion.prototype.destroy = function (event) {
 	delete this;
 }
 NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, message) {
+	var now = new Date();
+
 	var item = document.createElement("li");
 	item.className = "private-message";
 	item.innerText = text;
 	item.dataset.author = nickname;
+	item.dataset.date = now.getFullYear().pad() + "-" + (now.getMonth() + 1).pad() + "-" + now.getDate().pad() + " " + (now.getHours() + 1).pad() + ":" + (now.getMinutes() + 1).pad() + ":" + (now.getSeconds() + 1).pad();
 	this.tab_content_list.appendChild(item);
 
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
