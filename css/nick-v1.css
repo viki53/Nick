@@ -140,7 +140,7 @@ a:hover{
 .irc-tab-content-list>li{
 	position: relative;
 	padding: .25em .5em .25em 11.5em;
-	white-space: pre-wrap;
+	white-space: normal;
 }
 .irc-tab-content-list>li:hover{
 	background-color: #f9f9f9;
