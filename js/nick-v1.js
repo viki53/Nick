@@ -126,7 +126,7 @@ NickApp.prototype.loadConfig = function () {
 NickApp.prototype.saveConfig = function () {
 	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, '\t'), { encoding: 'utf8' });
 }
-NickApp.prototype.setActiveTab = function (serverHostname, channelName, elem) {
+NickApp.prototype.setActiveTab = function (serverHostname, channelName, userName, elem) {
 	if (elem.dataset.serverHostname != serverHostname) {
 		elem.classList.remove('active');
 		return;
@@ -135,12 +135,16 @@ NickApp.prototype.setActiveTab = function (serverHostname, channelName, elem) {
 		elem.classList.remove('active');
 		return;
 	}
+	if ((userName && elem.dataset.userName != userName) || (!userName && elem.dataset.userName)) {
+		elem.classList.remove('active');
+		return;
+	}
 	elem.classList.add('active');
 }
-NickApp.prototype.showTab = function (serverHostname, channelName) {
-	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(null, serverHostname, channelName));
-	Array.prototype.forEach.call(this.elems.irc_tabs_contents.children, this.setActiveTab.bind(null, serverHostname, channelName));
-	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(null, serverHostname, channelName));
+NickApp.prototype.showTab = function (serverHostname, channelName, userName) {
+	Array.prototype.forEach.call(this.elems.irc_tabs.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
+	Array.prototype.forEach.call(this.elems.irc_tabs_contents.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
+	Array.prototype.forEach.call(this.elems.irc_tabs_users.children, this.setActiveTab.bind(null, serverHostname, channelName, userName));
 }
 NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
 	// console.dir(event);
@@ -156,8 +160,8 @@ NickApp.prototype.onContentInputKeyUp = function (server, target, event) {
 
 			server.client.say(target.name, this.value);
 
-			if (target.onPublicMessage) {
-				target.onPublicMessage(server.temp_nickname, this.value);
+			if (target.onMessage) {
+				target.onMessage(server.temp_nickname, this.value);
 			}
 
 			this.value = "";
@@ -187,6 +191,7 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 
 	this.channels_names = channels_names;
 	this.channels = [];
+	this.discussions = [];
 
 	this.tab = document.createElement("li");
 	this.tab.textContent = this.hostname;
@@ -211,7 +216,7 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	return this;
 }
 NickApp.Server.prototype.onClientRegistered = function (message) {
-	console.log("registered : ", arguments);
+	// console.log("registered : ", arguments);
 
 	var welcome_message = document.createElement("li");
 	welcome_message.textContent = message.args[1];
@@ -246,16 +251,17 @@ NickApp.Server.prototype.joinNewChannel = function (name) {
 NickApp.Server.prototype.onClientError = function (message) {
 	console.log("error : ", message);
 }
-NickApp.Server.prototype.onPrivateMessage = function (from, message) {
+NickApp.Server.prototype.onPrivateMessage = function (nickname, text, message) {
 	console.log("pm : ", arguments);
 
-	var item = document.createElement("li");
-	item.className = "private-message";
-	item.innerText = "(MP) " + message;
-	item.dataset.author = from;
-	this.tab_content_list.appendChild(item);
+	var discussion = this.app.filter(this.discussions, { name : nickname }, true);
 
-	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+	if (!discussion) {
+		discussion = new NickApp.PrivateDiscussion(this.app, this, nickname);
+		this.discussions.push(discussion);
+	}
+
+	discussion.onMessage(nickname, text, message);
 }
 NickApp.Server.prototype.onNicksReceive = function (channel_name, nicks) {
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
@@ -267,7 +273,7 @@ NickApp.Server.prototype.onNicksReceive = function (channel_name, nicks) {
 	channel.onNicksReceive(nicks);
 }
 NickApp.Server.prototype.onUserNickChange = function (oldnickname, newnickname, channels, message) {
-	console.log("nick : ", arguments);
+	// console.log("nick : ", arguments);
 
 	var item = document.createElement("li");
 	item.className = "user-nick-change";
@@ -289,7 +295,7 @@ NickApp.Server.prototype.onUserQuit = function (nickname, reason, channels, mess
 	}, this);
 }
 NickApp.Server.prototype.onChannelTopic = function (channel_name, topic, nick, message) {
-	console.log("topic : ", arguments);
+	// console.log("topic : ", arguments);
 
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
 	if (!channel) {
@@ -355,20 +361,22 @@ NickApp.Channel.prototype.mentionRegexp = function (nickname) {
 	return new RegExp("(\\b)"+nickname+"(\\b)", "i");
 }
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
-	console.log("joined channel : ", arguments);
+	// console.log("joined channel : ", arguments);
 
 	this.app.showTab(this.server.hostname, this.name);
 
 	this.tab_content_input.focus();
 
-	this.server.client.addListener("message" + this.name, this.onPublicMessage.bind(this));
+	this.server.client.addListener("message" + this.name, this.onMessage.bind(this));
 
 	this.server.client.addListener("join" + this.name, this.onUserJoin.bind(this));
 
 	this.server.client.addListener("part" + this.name, this.onUserQuit.bind(this));
+
+	this.server.client.addListener("kick" + this.name, this.onUserKick.bind(this));
 }
-NickApp.Channel.prototype.onPublicMessage = function (nickname, text, message) {
-	console.log("message : ", arguments);
+NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
+	// console.log("message : ", arguments);
 
 	var user = this.app.filter(this.users, { name: nickname }, true);
 	if (!user) {
@@ -392,7 +400,7 @@ NickApp.Channel.prototype.onPublicMessage = function (nickname, text, message) {
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 }
 NickApp.Channel.prototype.onNicksReceive = function (nicks) {
-	console.log("names : ", arguments);
+	// console.log("names : ", arguments);
 
 	for (var nickname in nicks) {
 		var user = new NickApp.User(this.app, nickname, nicks[nickname]);
@@ -421,7 +429,7 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 	}
 }
 NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
-	console.log("join : ", arguments);
+	// console.log("join : ", arguments);
 
 	var user = new NickApp.User(this.app, nickname);
 
@@ -444,16 +452,14 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 	this.tab_users_list.appendChild(user_li);
 }
 NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
-	console.log("quit : ", arguments);
+	// console.log("quit : ", arguments);
 
 	var user = this.app.filter(this.users, { name: nickname }, true);
-	console.dir(user);
 	if (!user) {
 		return false;
 	}
 
 	var index = this.users.indexOf(user);
-	console.dir(index);
 	if (index === -1) {
 		return false;
 	}
@@ -475,8 +481,38 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 		}
 	});
 }
+NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
+	// console.log("kick : ", arguments);
+
+	var user = this.app.filter(this.users, { name: nickname }, true);
+	if (!user) {
+		return false;
+	}
+
+	var index = this.users.indexOf(user);
+	if (index === -1) {
+		return false;
+	}
+
+	this.users.splice(index, 1);
+
+	var item = document.createElement("li");
+	item.className = "user-kick";
+	item.innerText = nickname + " has been kicked";
+	if (reason) {
+		item.innerText += ": " + reason;
+	}
+	item.dataset.author = nickname;
+	this.tab_content_list.appendChild(item);
+
+	Array.prototype.forEach.call(this.tab_users_list.children, function(li) {
+		if (li.textContent == nickname) {
+			li.parentNode.removeChild(li);
+		}
+	});
+}
 NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
-	console.log("topic : ", arguments);
+	// console.log("topic : ", arguments);
 
 	this.tab_content_topic.textContent = topic;
 
@@ -489,6 +525,8 @@ NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
 }
 
+
+
 NickApp.User = function (app, name, role) {
 	this.app = app;
 
@@ -497,6 +535,55 @@ NickApp.User = function (app, name, role) {
 		this.role = role;
 	}
 	this.color = this.app.colors[Math.floor(Math.random()*this.app.colors.length)];
+}
+
+
+
+NickApp.PrivateDiscussion = function (app, server, nickname) {
+	this.app = app;
+
+	user = new NickApp.User(this.app, nickname);
+
+	this.name = nickname;
+	this.server = server;
+	this.user = user;
+
+	this.tab = document.createElement("li");
+	this.tab.textContent = this.name;
+	this.tab.dataset.serverHostname = this.server.hostname;
+	this.tab.dataset.userName = this.name;
+	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this.server.hostname, null, this.name), false);
+	this.app.elems.irc_tabs.appendChild(this.tab);
+
+	this.tab_content = document.createElement("div");
+	this.tab_content.className = "irc-tab-content";
+	this.tab_content.dataset.serverHostname = this.server.hostname;
+	this.tab_content.dataset.userName = this.name;
+	this.app.elems.irc_tabs_contents.appendChild(this.tab_content);
+
+	this.tab_content_list = document.createElement("ol");
+	this.tab_content_list.className = "irc-tab-content-list";
+	this.tab_content_list.reversed = true;
+	this.tab_content.appendChild(this.tab_content_list);
+
+	this.tab_content_input = document.createElement("input");
+	this.tab_content_input.type = "text";
+	this.tab_content_input.className = "irc-tab-content-input";
+	this.tab_content_input.addEventListener("keyup", this.app.onContentInputKeyUp.bind(this.tab_content_input, this.server, this), false);
+	this.tab_content.appendChild(this.tab_content_input);
+
+	return this;
+}
+NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, message) {
+	var item = document.createElement("li");
+	item.className = "private-message";
+	item.innerText = text;
+	item.dataset.author = nickname;
+	this.tab_content_list.appendChild(item);
+
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+
+	return this;
 }
 
 var app = new NickApp();

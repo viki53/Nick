@@ -136,7 +136,8 @@ a:hover{
 }
 .irc-tab-content-list>li.channel-topic,
 .irc-tab-content-list>li.user-join,
-.irc-tab-content-list>li.user-quit{
+.irc-tab-content-list>li.user-quit,
+.irc-tab-content-list>li.user-kick{
 	font-style: italic;
 }
 .irc-tab-content-list>li.public-message.mentioned{
