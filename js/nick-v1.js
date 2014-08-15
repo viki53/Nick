@@ -60,6 +60,8 @@ NickApp.prototype.onWindowClose = function () {
 	this.servers.forEach(function (server) {
 		server.client.disconnect("Nick client exit");
 	});
+
+	this.saveConfig();
 }
 NickApp.prototype.filter = function (array, predicate, returnFirst) {
 	var results = [];
@@ -727,7 +729,7 @@ NickApp.PrivateDiscussion.prototype.destroy = function (event) {
 	this.tab.parentNode.removeChild(this.tab);
 	this.tab_content.parentNode.removeChild(this.tab_content);
 
-	this.app.showTab(this);
+	this.app.showTab(this.server);
 
 	if (event) {
 		event.stopPropagation();
