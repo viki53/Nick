@@ -24,7 +24,7 @@ Vous pouvez spécifier un nickname général (valable pour l'ensemble des serveu
 ### Installer les dépendances
 
 ```
-npm install
+$ npm install
 ```
 
 ### Lancer l'application
@@ -35,4 +35,4 @@ Si vous utilisez Sublime Text, des Build Systems sont fournis pour OS X et Linux
 
 #### Autres méthodes
 
-Retrouvez les détails pour lancer le client de différentes façons sur [le Wiki de Noe-WebKit](https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps).
+Retrouvez les détails pour lancer le client de différentes façons sur [le Wiki de Node-WebKit](https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps).
