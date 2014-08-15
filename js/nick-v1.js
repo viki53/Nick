@@ -171,7 +171,15 @@ NickApp.prototype.onContentInputKeyUp = function (server, target, elem, event) {
 				return;
 			}
 			else if (elem.value.match(/^\/nick/)) {
-				server.client.send("NICK", elem.value.substring(5).trim());
+				var newnickname = elem.value.substring(5).trim();
+				server.client.send("NICK", newnickname);
+
+				if (target instanceof NickApp.Channel) {
+					target.onUserNickChange(server.temp_nickname, newnickname);
+				}
+				else if (server.current_user) {
+					server.current_user.changeNickname(newnickname);
+				}
 
 				elem.value = "";
 				return;
@@ -295,8 +303,12 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 	this.channels_names.forEach(this.joinNewChannel, this);
 }
 NickApp.Server.prototype.joinNewChannel = function (name) {
+	do {
+		name = prompt("Nom du channel à rejoindre", "");
+	} while (name = "");
+
 	if (!name) {
-		name = prompt("Nom du channel à rejoindre", "#zestedesavoir");
+		return false;
 	}
 
 	var channel = new NickApp.Channel(this.app, name, this);
@@ -648,7 +660,7 @@ NickApp.User.prototype.changeNickname = function (newnickname) {
 		new_li.textContent = newnickname;
 
 		if (!new_li.classList.contains("me")) { 
-			new_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, user.name, null, null));
+			new_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, this.name, null, null));
 			new_li.addEventListener("click", this.insertNicknameToInput.bind(this, newnickname));
 		}
 
