@@ -10,6 +10,10 @@ Number.prototype.pad = function () {
 	return this;
 }
 
+Date.prototype.toIRCformat = function() {
+	return this.getFullYear().pad() + "-" + (this.getMonth() + 1).pad() + "-" + this.getDate().pad() + " " + (this.getHours() + 1).pad() + ":" + (this.getMinutes() + 1).pad() + ":" + (this.getSeconds() + 1).pad();
+}
+
 NickApp = function () {
 	this.elems = {
 		page_irc: document.getElementById("page-irc"),
@@ -454,7 +458,7 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 	item.style.color = user.color;
 	item.innerText = text;
 	item.dataset.author = nickname;
-	item.dataset.date = now.getFullYear().pad() + "-" + (now.getMonth() + 1).pad() + "-" + now.getDate().pad() + " " + (now.getHours() + 1).pad() + ":" + (now.getMinutes() + 1).pad() + ":" + (now.getSeconds() + 1).pad();
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	this.app.processMessageContent(item);
@@ -502,11 +506,14 @@ NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 
 	this.users.push(user);
 
+	var now = new Date();
+
 	var item = document.createElement("li");
 	item.className = "user-join";
 	item.innerText = nickname + " joined ";
 	item.style.color = user.color;
 	item.dataset.author = nickname;
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
@@ -528,6 +535,8 @@ NickApp.Channel.prototype.onUserNickChange = function (oldnickname, newnickname,
 		return false;
 	}
 
+	var now = new Date();
+
 	user.name = newnickname;
 
 	var item = document.createElement("li");
@@ -535,6 +544,7 @@ NickApp.Channel.prototype.onUserNickChange = function (oldnickname, newnickname,
 	item.style.color = user.color;
 	item.innerText = oldnickname + " will now be called " + newnickname;
 	item.dataset.author = newnickname;
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	Array.prototype.forEach.call(this.tab_users_list.children, function(li) {
@@ -569,6 +579,8 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 		return false;
 	}
 
+	var now = new Date();
+
 	this.users.splice(index, 1);
 
 	var item = document.createElement("li");
@@ -579,6 +591,7 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 		item.innerText += ": " + reason;
 	}
 	item.dataset.author = nickname;
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	Array.prototype.forEach.call(this.tab_users_list.children, function(li) {
@@ -598,6 +611,8 @@ NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
 		return false;
 	}
 
+	var now = new Date();
+
 	this.users.splice(index, 1);
 
 	var item = document.createElement("li");
@@ -608,6 +623,7 @@ NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
 		item.innerText += ": " + reason;
 	}
 	item.dataset.author = nickname;
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	Array.prototype.forEach.call(this.tab_users_list.children, function(li) {
@@ -619,10 +635,13 @@ NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
 NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 	this.tab_content_topic.textContent = topic;
 
+	var now = new Date();
+
 	var item = document.createElement("li");
 	item.className = "channel-topic";
 	item.innerText = "Topic is now " + topic;
 	item.dataset.author = nickname;
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
@@ -711,7 +730,7 @@ NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, messag
 	}
 	item.innerText = text;
 	item.dataset.author = nickname;
-	item.dataset.date = now.getFullYear().pad() + "-" + (now.getMonth() + 1).pad() + "-" + now.getDate().pad() + " " + (now.getHours() + 1).pad() + ":" + (now.getMinutes() + 1).pad() + ":" + (now.getSeconds() + 1).pad();
+	item.dataset.date = now.toIRCformat();
 	this.tab_content_list.appendChild(item);
 
 	this.app.processMessageContent(item);
