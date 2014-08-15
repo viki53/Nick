@@ -136,6 +136,21 @@ NickApp.prototype.loadConfig = function () {
 	}
 }
 NickApp.prototype.saveConfig = function () {
+	this.config.servers = [];
+
+	this.servers.forEach(function(server) {
+		var serv = {
+			hostname: server.name,
+			channels: []
+		};
+
+		server.channels.forEach(function(channel) {
+			serv.channels.push(channel.name);
+		});
+
+		this.config.servers.push(serv);
+	});
+
 	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, '\t'), { encoding: 'utf8' });
 }
 NickApp.prototype.setActiveTab = function (target, elem) {
