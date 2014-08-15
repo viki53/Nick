@@ -29,4 +29,10 @@ npm install
 
 ### Lancer l'application
 
+#### Avec Sublime Text
+
+Si vous utilisez Sublime Text, des Build Systems sont fournis pour OS X et Linux, vous n'avez qu'à adapter le chemin vers node-webkit.
+
+#### Autres méthodes
+
 Retrouvez les détails pour lancer le client de différentes façons sur [le Wiki de Noe-WebKit](https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps).
