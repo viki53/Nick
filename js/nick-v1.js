@@ -661,7 +661,7 @@ NickApp.User.prototype.changeNickname = function (newnickname) {
 
 		if (!new_li.classList.contains("me")) { 
 			new_li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, this.name, null, null));
-			new_li.addEventListener("click", this.insertNicknameToInput.bind(this, newnickname));
+			new_li.addEventListener("click", this.target.insertNicknameToInput.bind(this, newnickname));
 		}
 
 		this.li = new_li;
