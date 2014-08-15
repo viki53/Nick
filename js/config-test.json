@@ -7,5 +7,6 @@
 				"#nick_tests"
 			]
 		}
-	]
+	],
+	"save_servers_on_quit": true
 }
