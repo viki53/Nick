@@ -573,6 +573,7 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 
 	var item = document.createElement("li");
 	item.className = "user-quit";
+	item.style.color = user.color;
 	item.innerText = nickname + " has quit";
 	if (reason) {
 		item.innerText += ": " + reason;
@@ -601,6 +602,7 @@ NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
 
 	var item = document.createElement("li");
 	item.className = "user-kick";
+	item.style.color = user.color;
 	item.innerText = nickname + " has been kicked";
 	if (reason) {
 		item.innerText += ": " + reason;
