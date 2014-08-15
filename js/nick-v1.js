@@ -303,9 +303,9 @@ NickApp.Server.prototype.onClientRegistered = function (message) {
 	this.channels_names.forEach(this.joinNewChannel, this);
 }
 NickApp.Server.prototype.joinNewChannel = function (name) {
-	do {
+	while (name === "") {
 		name = prompt("Nom du channel à rejoindre", "");
-	} while (name = "");
+	}
 
 	if (!name) {
 		return false;
