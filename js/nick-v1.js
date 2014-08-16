@@ -53,6 +53,10 @@ NickApp = function () {
 	// gui.Shell.openExternal("http://website.com") // Ouvre une fenêtre externe (pratique pour les liens)
 
 	this.main_window.on('closed', this.onWindowClose.bind(this));
+
+	if (!this.config.hide_messages_details) {
+		this.elems.page_irc.classList.add("show-messages-details");
+	}
 }
 NickApp.prototype.onWindowClose = function () {
 	this.servers.forEach(function (server) {
@@ -641,6 +645,8 @@ NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 NickApp.Channel.prototype.addMessage = function (content, type, author) {
 	var now = new Date();
 
+	var shouldRefreshScroll = this.tab_content_list.scrollTop === this.tab_content_list.scrollHeight;
+
 	var item = document.createElement("li");
 
 	item.className = type;
@@ -656,7 +662,7 @@ NickApp.Channel.prototype.addMessage = function (content, type, author) {
 	if (!this.tab.classList.contains("active")) {
 		this.tab.classList.add("has-unread");
 	}
-	else {
+	else if(shouldRefreshScroll) {
 		this.refreshScroll();
 	}
 

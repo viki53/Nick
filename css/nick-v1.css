@@ -140,14 +140,17 @@ a:hover{
 }
 .irc-tab-content-list>li{
 	position: relative;
-	padding: .25em .5em .25em 11.5em;
+	padding: .25em .5em;
 	white-space: normal;
+}
+.show-messages-details .irc-tab-content-list>li{
+	padding-left: 11.5em;
 }
 .irc-tab-content-list>li:hover{
 	background-color: #f9f9f9;
 }
-.irc-tab-content-list>li::before,
-.irc-tab-content-list>li[data-date]:hover::after{
+.show-messages-details .irc-tab-content-list>li::before,
+.show-messages-details .irc-tab-content-list>li[data-date]:hover::after{
 	content: "";
 	position: absolute;
 	top: 0;
@@ -160,11 +163,11 @@ a:hover{
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-.irc-tab-content-list>li.public-message::before,
-.irc-tab-content-list>li.private-message::before{
+.show-messages-details .irc-tab-content-list>li.public-message::before,
+.show-messages-details .irc-tab-content-list>li.private-message::before{
 	content: attr(data-author);
 }
-.irc-tab-content-list>li[data-date]:hover::after{
+.show-messages-details .irc-tab-content-list>li[data-date]:hover::after{
 	content: "[" attr(data-date) "]";
 	background-color: #f5f5f5;
 }
