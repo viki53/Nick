@@ -102,7 +102,7 @@ a:hover{
 }
 .viewing-server #irc-tabs-contents,
 .show-users-list.viewing-channel #irc-tabs-contents{
-	right: 11em;
+	right: 7em;
 }
 .irc-tab-content{
 	display: none;
@@ -148,19 +148,20 @@ a:hover{
 	white-space: normal;
 }
 .show-messages-details .irc-tab-content-list>li{
-	padding-left: 11.5em;
+	padding-left: 7.5em;
 }
 .irc-tab-content-list>li:hover{
 	background-color: #f9f9f9;
 }
 .show-messages-details .irc-tab-content-list>li::before,
 .show-messages-details .irc-tab-content-list>li[data-date]:hover::after{
+	box-sizing: border-box;
 	content: "";
 	position: absolute;
 	top: 0;
 	left: 0;
 	padding: .25em .5em;
-	width: 10em;
+	width: 7em;
 	text-align: right;
 	vertical-align: top;
 	white-space: nowrap;
@@ -212,11 +213,10 @@ a:hover{
 	top: 0;
 	right: 0;
 	bottom: 2em;
-	width: 11em;
+	width: 7em;
 	overflow-y: auto;
 	background-color: #eeeeee;
 	border-left: 1px solid #e0e0e0;
-	-webkit-user-select: none;
 	user-select: none;
 }
 .viewing-server #irc-tabs-users,
@@ -236,7 +236,10 @@ a:hover{
 }
 .irc-tab-users>li,
 .irc-tab-channels>li{
-	padding: 0 .5em;
+	padding: .25em .5em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .irc-tab-users>li:hover,
 .irc-tab-channels>li:hover{
@@ -251,9 +254,9 @@ a:hover{
 }
 .irc-tab-users>li[data-user-role]::before{
 	content: attr(data-user-role) " ";
-	color: #5677fc;
-},
+	color: #000;
+}
 .irc-tab-channels>li[data-users-number]::before{
-	content: attr(data-users-number) " ";
+	content: "(" attr(data-users-number) ") ";
 	color: #5677fc;
 }

@@ -399,7 +399,7 @@ NickApp.Server.prototype.onChannelsList = function (channels_list) {
 			channel_li.title = chan.topic;
 		}
 		if (chan.users) {
-			channel_li.dataset.users_number = chan.users;
+			channel_li.dataset.usersNumber = chan.users;
 		}
 		channel_li.addEventListener("dblclick", this.joinNewChannel.bind(this, chan.name), false);
 		this.tab_channels_list.appendChild(channel_li);
