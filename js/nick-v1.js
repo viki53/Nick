@@ -47,8 +47,10 @@ NickApp = function () {
 		console.log(ex.message);
 	}
 
-	this.main_window.showDevTools();
-	this.main_window.focus();
+	if (this.config.debug) {
+		this.main_window.showDevTools();
+		this.main_window.focus();
+	}
 
 	// gui.Shell.openExternal("http://website.com") // Ouvre une fenêtre externe (pratique pour les liens)
 
@@ -301,7 +303,6 @@ NickApp.prototype.onContentInputKeyUp = function (server, target, elem, event) {
 }
 NickApp.prototype.processMessageContent = function (li) {
 	li.innerHTML = li.innerHTML.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/i, function(match, url) {
-		console.dir(arguments);
 		return url.link(url).replace(/<a href/, "<a onclick=\"app.openExternalLink(this.href); return false;\" href");
 	});
 }
