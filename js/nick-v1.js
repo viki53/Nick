@@ -57,6 +57,9 @@ NickApp = function () {
 	if (!this.config.hide_messages_details) {
 		this.elems.page_irc.classList.add("show-messages-details");
 	}
+	if (!this.config.hide_users_list) {
+		this.elems.page_irc.classList.add("show-users-list");
+	}
 }
 NickApp.prototype.onWindowClose = function () {
 	this.servers.forEach(function (server) {

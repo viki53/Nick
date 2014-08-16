@@ -96,9 +96,12 @@ a:hover{
 #irc-tabs-contents{
 	position: fixed;
 	top: 0;
-	right: 11em;
+	right: 0;
 	bottom: 2em;
 	left: 0;
+}
+.show-users-list #irc-tabs-contents{
+	right: 11em;
 }
 .irc-tab-content{
 	display: none;
@@ -202,6 +205,7 @@ a:hover{
 }
 
 #irc-tabs-users{
+	display: none;
 	box-sizing: border-box;
 	position: absolute;
 	top: 0;
@@ -213,6 +217,9 @@ a:hover{
 	border-left: 1px solid #e0e0e0;
 	-webkit-user-select: none;
 	user-select: none;
+}
+.show-users-list #irc-tabs-users{
+	display: block;
 }
 .irc-tab-users,
 .irc-tab-channels{

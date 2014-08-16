@@ -9,5 +9,6 @@
 		}
 	],
 	"save_servers_on_quit": true,
-	"hide_messages_details": true
+	"hide_messages_details": true,
+	"hide_users_list": true
 }
