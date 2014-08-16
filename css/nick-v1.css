@@ -100,7 +100,8 @@ a:hover{
 	bottom: 2em;
 	left: 0;
 }
-.show-users-list #irc-tabs-contents{
+.viewing-server #irc-tabs-contents,
+.show-users-list.viewing-channel #irc-tabs-contents{
 	right: 11em;
 }
 .irc-tab-content{
@@ -218,7 +219,8 @@ a:hover{
 	-webkit-user-select: none;
 	user-select: none;
 }
-.show-users-list #irc-tabs-users{
+.viewing-server #irc-tabs-users,
+.show-users-list.viewing-channel #irc-tabs-users{
 	display: block;
 }
 .irc-tab-users,

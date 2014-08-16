@@ -215,6 +215,20 @@ NickApp.prototype.showTab = function (target) {
 	if (target.refreshScroll) {
 		target.refreshScroll();
 	}
+
+	this.elems.page_irc.classList.remove("viewing-channel");
+	this.elems.page_irc.classList.remove("viewing-private-discussion");
+	this.elems.page_irc.classList.remove("viewing-server");
+
+	if (target instanceof NickApp.Channel) {
+		this.elems.page_irc.classList.add("viewing-channel");
+	}
+	else if (target instanceof NickApp.PrivateDiscussion) {
+		this.elems.page_irc.classList.add("viewing-private-discussion");
+	}
+	else if (target instanceof NickApp.Server) {
+		this.elems.page_irc.classList.add("viewing-server");
+	}
 }
 NickApp.prototype.onContentInputKeyUp = function (server, target, elem, event) {
 	if (event.which === 13) {
@@ -305,14 +319,14 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.discussions = [];
 
 	this.tab = document.createElement("li");
-	this.tab.className = "tab";
+	this.tab.className = "tab server";
 	this.tab.textContent = this.name;
 	this.tab.dataset.serverName = this.name;
 	this.tab.addEventListener("click", this.app.showTab.bind(this.app, this), false);
 	this.app.elems.irc_tabs.appendChild(this.tab);
 
 	this.tab_content = document.createElement("div");
-	this.tab_content.className = "irc-tab-content";
+	this.tab_content.className = "irc-tab-content server";
 	this.tab_content.dataset.serverName = this.name;
 	this.app.elems.irc_tabs_contents.appendChild(this.tab_content);
 
@@ -322,7 +336,7 @@ NickApp.Server = function (app, hostname, nickname, channels_names) {
 	this.tab_content.appendChild(this.tab_content_list);
 
 	this.tab_channels_list = document.createElement("ul");
-	this.tab_channels_list.className = "irc-tab-channels";
+	this.tab_channels_list.className = "irc-tab-channels server";
 	this.tab_channels_list.dataset.serverName = this.name;
 	this.app.elems.irc_tabs_users.appendChild(this.tab_channels_list);
 	
@@ -450,7 +464,7 @@ NickApp.Channel = function (app, name, server) {
 	this.users = [];
 
 	this.tab = document.createElement("li");
-	this.tab.className = "tab";
+	this.tab.className = "tab channel";
 	this.tab.textContent = this.name;
 	this.tab.dataset.serverName = this.server.name;
 	this.tab.dataset.channelName = this.name;
@@ -464,7 +478,7 @@ NickApp.Channel = function (app, name, server) {
 	this.tab.appendChild(this.close_button);
 
 	this.tab_content = document.createElement("div");
-	this.tab_content.className = "irc-tab-content";
+	this.tab_content.className = "irc-tab-content channel";
 	this.tab_content.dataset.serverName = this.server.name;
 	this.tab_content.dataset.channelName = this.name;
 	this.app.elems.irc_tabs_contents.appendChild(this.tab_content);
@@ -485,10 +499,12 @@ NickApp.Channel = function (app, name, server) {
 	this.tab_content.appendChild(this.tab_content_input);
 
 	this.tab_users_list = document.createElement("ul");
-	this.tab_users_list.className = "irc-tab-users";
+	this.tab_users_list.className = "irc-tab-users channel";
 	this.tab_users_list.dataset.serverName = this.server.name;
 	this.tab_users_list.dataset.channelName = this.name;
 	this.app.elems.irc_tabs_users.appendChild(this.tab_users_list);
+
+	this.app.showTab(this);
 
 	try{
 		this.server.client.join(this.name, this.onChannelJoined.bind(this));
@@ -528,8 +544,6 @@ NickApp.Channel.prototype.insertNicknameToInput = function (nickname) {
 	this.tab_content_input.focus();
 }
 NickApp.Channel.prototype.onChannelJoined = function (nickname) {
-	this.app.showTab(this);
-
 	this.tab_content_input.focus();
 
 	this.server.client.addListener("message" + this.name, this.onMessage.bind(this));
@@ -748,7 +762,7 @@ NickApp.PrivateDiscussion = function (app, server, nickname) {
 	this.user = new NickApp.User(this.app, this.server, this, nickname);
 
 	this.tab = document.createElement("li");
-	this.tab.className = "tab";
+	this.tab.className = "tab private-discussion";
 	this.tab.textContent = this.name;
 	this.tab.dataset.serverName = this.server.name;
 	this.tab.dataset.userName = this.name;
@@ -762,7 +776,7 @@ NickApp.PrivateDiscussion = function (app, server, nickname) {
 	this.tab.appendChild(this.close_button);
 
 	this.tab_content = document.createElement("div");
-	this.tab_content.className = "irc-tab-content";
+	this.tab_content.className = "irc-tab-content private-discussion";
 	this.tab_content.dataset.serverName = this.server.name;
 	this.tab_content.dataset.userName = this.name;
 	this.app.elems.irc_tabs_contents.appendChild(this.tab_content);
