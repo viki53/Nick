@@ -449,6 +449,9 @@ NickApp.Server.prototype.onUserQuit = function (nickname, reason, channels, mess
 		channel.onUserQuit(nickname, reason, message);
 	}, this);
 }
+NickApp.Server.prototype.onMessageOfTheDay = function (motd) {
+	this.addMessage(motd, "message-of-the-day");
+}
 NickApp.Server.prototype.onChannelTopic = function (channel_name, topic, nick, message) {
 	var channel = this.app.filter(this.channels, { name: channel_name }, true);
 	if (!channel) {
@@ -457,6 +460,38 @@ NickApp.Server.prototype.onChannelTopic = function (channel_name, topic, nick, m
 	}
 	
 	channel.onTopicChange(topic, nick, message);
+}
+NickApp.Channel.prototype.addMessage = function (content, type, author) {
+	var now = new Date();
+
+	var shouldRefreshScroll = this.tab_content_list.scrollTop === this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
+
+	var item = document.createElement("li");
+
+	item.className = type;
+	item.innerText = content;
+	item.dataset.date = now.toIRCformat();
+	if (author) {
+		item.dataset.author = author.name;
+		item.style.color = author.color;
+	}
+
+	this.tab_content_list.appendChild(item);
+	
+	if (!this.tab.classList.contains("active")) {
+		this.tab.classList.add("has-unread");
+	}
+	else if(shouldRefreshScroll) {
+		this.refreshScroll();
+	}
+
+	return item;
+}
+NickApp.Channel.prototype.resetUnread = function () {
+	this.tab.classList.remove("has-unread");
+}
+NickApp.Channel.prototype.refreshScroll = function () {
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
 }
 
 
@@ -558,6 +593,8 @@ NickApp.Channel.prototype.onChannelJoined = function (nickname) {
 	this.server.client.addListener("part" + this.name, this.onUserQuit.bind(this));
 
 	this.server.client.addListener("kick" + this.name, this.onUserKick.bind(this));
+
+	this.server.client.addListener("kill" + this.name, this.onUserKilled.bind(this));
 }
 NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 	var user = this.app.filter(this.users, { name: nickname }, true);
@@ -575,6 +612,8 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 	}
 }
 NickApp.Channel.prototype.onNicksReceive = function (nicks) {
+	this.tab_users_list.innerHTML = "";
+
 	for (var nickname in nicks) {
 		var usr = { name: nickname, role: nicks[nickname] };
 		var user = new NickApp.User(this.app, this.server, this, nickname, nicks[nickname]);
@@ -642,6 +681,32 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 		content += ": " + reason;
 	}
 	this.addMessage(content, "user-quit", user);
+}
+NickApp.Channel.prototype.onUserKilled = function (nickname, reason, message) {
+	var user = this.app.filter(this.users, { name: nickname }, true);
+	if (!user) {
+		return false;
+	}
+
+	var index = this.users.indexOf(user);
+	if (index === -1) {
+		return false;
+	}
+
+	this.users.splice(index, 1);
+
+	user.destroy();
+
+	var content = nickname + " has been killed";
+	if (reason) {
+		content += ": " + reason;
+	}
+	this.addMessage(content, "user-kill", user);
+
+	if (nickname === this.server.temp_nickname) {
+		this.server.joinNewChannel(this.name);
+		this.destroy();
+	}
 }
 NickApp.Channel.prototype.onUserKick = function (nickname, reason, message) {
 	var user = this.app.filter(this.users, { name: nickname }, true);
