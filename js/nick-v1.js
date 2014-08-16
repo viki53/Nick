@@ -31,8 +31,6 @@ NickApp = function () {
 
 	this.loadConfig();
 
-	this.saveConfig();
-
 	this.config.servers.forEach(function(serv) {
 		var server = new NickApp.Server(this, serv.hostname, serv.nickname || this.config.nickname, serv.channels);
 		this.servers.push(server);
@@ -94,6 +92,31 @@ NickApp.prototype.defaultConfig = {
 			channels: []
 		}
 	]
+}
+NickApp.prototype.roles = [
+	"&", // Super-operator
+	"@", // Operator
+	"%", // Half-operator
+	"+", // Voice
+	"~", // Founder
+]
+NickApp.prototype.compareUsers = function (userA, userB) {
+	if (this.roles.indexOf(userA.role) > this.roles.indexOf(userB.role)) {
+		return -1;
+	}
+	else if (this.roles.indexOf(userA.role) < this.roles.indexOf(userB.role)) {
+		return +1;
+	}
+	else {
+		if (userA.name.toLowerCase() > userB.name.toLowerCase()) {
+			return +1;
+		}
+		if (userA.name.toLowerCase() < userB.name.toLowerCase()) {
+			return -1;
+		}
+		return 0;
+	}
+	return 0;
 }
 NickApp.prototype.colors = [
 	"#c41411",
@@ -521,13 +544,8 @@ NickApp.Channel.prototype.onMessage = function (nickname, text, message) {
 }
 NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 	for (var nickname in nicks) {
+		var usr = { name: nickname, role: nicks[nickname] };
 		var user = new NickApp.User(this.app, this.server, this, nickname, nicks[nickname]);
-		
-		// ~	: Owner
-		// @	: OP
-		// &	: Admin
-		// %	: HOP
-		// +	: Voice
 
 		if (user.name === this.server.temp_nickname) {
 			user.li.classList.add("me");
@@ -537,11 +555,23 @@ NickApp.Channel.prototype.onNicksReceive = function (nicks) {
 
 		this.users.push(user);
 	}
+
+	this.users.sort(this.app.compareUsers.bind(this.app));
+
+	this.users.forEach(function (user) {
+		this.tab_users_list.appendChild(user.li);
+	}, this);
 }
 NickApp.Channel.prototype.onUserJoin = function (nickname, message) {
 	var user = new NickApp.User(this.app, this.server, this, nickname);
 
 	this.users.push(user);
+	
+	this.users.sort(this.app.compareUsers.bind(this.app));
+
+	this.users.forEach(function (user) {
+		this.tab_users_list.appendChild(user.li);
+	}, this);
 
 	this.addMessage(nickname + " joined", "user-join", user);
 }
@@ -658,7 +688,6 @@ NickApp.User = function (app, server, target, name, role) {
 		}
 		this.li.addEventListener("dblclick", this.server.onPrivateMessage.bind(this.server, this.name, null, null));
 		this.li.addEventListener("click", this.target.insertNicknameToInput.bind(this.target, this.name));
-		this.target.tab_users_list.appendChild(this.li);
 	}
 }
 NickApp.User.prototype.resetColor = function () {
