@@ -101,13 +101,13 @@ NickApp.prototype.roles = [
 	"~", // Founder
 ]
 NickApp.prototype.compareUsers = function (userA, userB) {
-	if (this.roles.indexOf(userA.role) > this.roles.indexOf(userB.role)) {
+	if (userA.role && !userB.role) {
 		return -1;
 	}
-	else if (this.roles.indexOf(userA.role) < this.roles.indexOf(userB.role)) {
+	else if (!userA.role && userB.role) {
 		return +1;
 	}
-	else {
+	else if ((userA.role && userB.role) || (!userA.role && !userB.role)) {
 		if (userA.name.toLowerCase() > userB.name.toLowerCase()) {
 			return +1;
 		}
@@ -115,6 +115,12 @@ NickApp.prototype.compareUsers = function (userA, userB) {
 			return -1;
 		}
 		return 0;
+	}
+	else if (this.roles.indexOf(userA.role) > this.roles.indexOf(userB.role)) {
+		return +1;
+	}
+	else if (this.roles.indexOf(userA.role) < this.roles.indexOf(userB.role)) {
+		return -1;
 	}
 	return 0;
 }
