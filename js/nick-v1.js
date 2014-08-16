@@ -461,7 +461,7 @@ NickApp.Server.prototype.onChannelTopic = function (channel_name, topic, nick, m
 	
 	channel.onTopicChange(topic, nick, message);
 }
-NickApp.Channel.prototype.addMessage = function (content, type, author) {
+NickApp.Server.prototype.addMessage = function (content, type, author) {
 	var now = new Date();
 
 	var shouldRefreshScroll = this.tab_content_list.scrollTop === this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
@@ -487,10 +487,10 @@ NickApp.Channel.prototype.addMessage = function (content, type, author) {
 
 	return item;
 }
-NickApp.Channel.prototype.resetUnread = function () {
+NickApp.Server.prototype.resetUnread = function () {
 	this.tab.classList.remove("has-unread");
 }
-NickApp.Channel.prototype.refreshScroll = function () {
+NickApp.Server.prototype.refreshScroll = function () {
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
 }
 
@@ -681,6 +681,11 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 		content += ": " + reason;
 	}
 	this.addMessage(content, "user-quit", user);
+
+	if (nickname === this.server.temp_nickname) {
+		this.server.joinNewChannel(this.name);
+		this.destroy();
+	}
 }
 NickApp.Channel.prototype.onUserKilled = function (nickname, reason, message) {
 	var user = this.app.filter(this.users, { name: nickname }, true);

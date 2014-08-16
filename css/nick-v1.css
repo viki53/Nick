@@ -179,6 +179,7 @@ a:hover{
 .irc-tab-content-list>li.message-of-the-day,
 .irc-tab-content-list>li.channel-topic,
 .irc-tab-content-list>li.user-join,
+.irc-tab-content-list>li.user-nick-change,
 .irc-tab-content-list>li.user-quit,
 .irc-tab-content-list>li.user-kill,
 .irc-tab-content-list>li.user-kick{
