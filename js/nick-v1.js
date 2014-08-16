@@ -216,6 +216,10 @@ NickApp.prototype.showTab = function (target) {
 		target.refreshScroll();
 	}
 
+	if (target.tab_content_input) {
+		target.tab_content_input.focus();
+	}
+
 	this.elems.page_irc.classList.remove("viewing-channel");
 	this.elems.page_irc.classList.remove("viewing-private-discussion");
 	this.elems.page_irc.classList.remove("viewing-server");
@@ -662,7 +666,7 @@ NickApp.Channel.prototype.onTopicChange = function (topic, nickname, message) {
 NickApp.Channel.prototype.addMessage = function (content, type, author) {
 	var now = new Date();
 
-	var shouldRefreshScroll = this.tab_content_list.scrollTop === this.tab_content_list.scrollHeight;
+	var shouldRefreshScroll = this.tab_content_list.scrollTop === this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
 
 	var item = document.createElement("li");
 
@@ -689,7 +693,7 @@ NickApp.Channel.prototype.resetUnread = function () {
 	this.tab.classList.remove("has-unread");
 }
 NickApp.Channel.prototype.refreshScroll = function () {
-	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
 }
 
 
@@ -823,6 +827,8 @@ NickApp.PrivateDiscussion.prototype.onMessage = function (nickname, text, messag
 }
 NickApp.PrivateDiscussion.prototype.addMessage = function (content, type, author) {
 	var now = new Date();
+	
+	var shouldRefreshScroll = this.tab_content_list.scrollTop === this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
 
 	var item = document.createElement("li");
 
@@ -839,7 +845,7 @@ NickApp.PrivateDiscussion.prototype.addMessage = function (content, type, author
 	if (!this.tab.classList.contains("active")) {
 		this.tab.classList.add("has-unread");
 	}
-	else {
+	else if(shouldRefreshScroll) {
 		this.refreshScroll();
 	}
 
@@ -849,7 +855,7 @@ NickApp.PrivateDiscussion.prototype.resetUnread = function () {
 	this.tab.classList.remove("has-unread");
 }
 NickApp.PrivateDiscussion.prototype.refreshScroll = function () {
-	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight;
+	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
 }
 
 var app = new NickApp();
