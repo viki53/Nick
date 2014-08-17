@@ -13,7 +13,6 @@ body{
 	margin: 0;
 	padding: 0;
 	height: 100%;
-	white-space: pre;
 	overflow: hidden;
 }
 
@@ -328,6 +327,7 @@ textarea{
 	right: 2em;
 	bottom: 2em;
 	left: 2em;
+	padding: 1em;
 	background-color: #fff;
 	box-shadow: 0 0 2em #212121;
 	-webkit-transform: scale(0);
@@ -343,7 +343,8 @@ textarea{
 	transition: transform .3s ease-in-out;
 }
 .popup-content{
-	padding: 1em;
+	box-sizing: border-box;
+	max-height: 100%;
 	overflow-y: auto;
 }
 #popup-overlay{

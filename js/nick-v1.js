@@ -187,7 +187,7 @@ NickApp.prototype.saveConfig = function () {
 	if (this.config.save_servers_on_quit) {
 		this.config.servers = [];
 
-		this.servers.forEach(function(server) {
+		this.servers.forEach.call(this, function(server) {
 			var serv = {
 				hostname: server.name,
 				channels: []
@@ -228,18 +228,8 @@ NickApp.prototype.setConfigPage = function() {
 				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = event.target.checked; }).bind(this, opt), false);
 			break;
 
-			case "string":
-				opt_elem.classList.add("option-string");
-
-				var opt_input = document.createElement("input");
-				opt_input.type = "text";
-				opt_input.name = opt;
-				opt_input.value = this.config[opt];
-
-				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = event.target.value; }).bind(this, opt), false);
-			break;
-
-			default:
+			case "array":
+			case "object":
 				opt_elem.classList.add("option-text");
 
 				var opt_input = document.createElement("textarea");
@@ -249,6 +239,18 @@ NickApp.prototype.setConfigPage = function() {
 				opt_input.rows = value.split("\n").length;
 
 				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = JSON.parse(event.target.value); }).bind(this, opt), false);
+			break;
+
+			case "string":
+			default:
+				opt_elem.classList.add("option-string");
+
+				var opt_input = document.createElement("input");
+				opt_input.type = "text";
+				opt_input.name = opt;
+				opt_input.value = this.config[opt];
+
+				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = event.target.value; }).bind(this, opt), false);
 			break;
 		}
 		opt_input.id = this.elems.page_config_content + "-option-" + opt;
