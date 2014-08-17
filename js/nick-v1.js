@@ -203,7 +203,7 @@ NickApp.prototype.saveConfig = function () {
 		}, this);
 	}
 
-	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, "\t"), { encoding: 'utf8' });
+	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, "\t"), { encoding: "utf8", flag: "w" });
 }
 NickApp.prototype.setConfigPage = function() {
 	this.elems.page_config_content.innerHTML = "";
