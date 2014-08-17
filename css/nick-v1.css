@@ -148,6 +148,9 @@ textarea{
 	font-size: 1em;
 	font-weight: normal;
 	line-height: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	background-color: #eeeeee;
 	border-bottom: 1px solid #e0e0e0;
 }
