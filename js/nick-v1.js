@@ -19,8 +19,15 @@ NickApp = function () {
 		page_irc: document.getElementById("page-irc"),
 		irc_tabs: document.getElementById("irc-tabs"),
 		irc_tabs_contents: document.getElementById("irc-tabs-contents"),
-		irc_tabs_users: document.getElementById("irc-tabs-users")
+		irc_tabs_users: document.getElementById("irc-tabs-users"),
+		page_config: document.getElementById("page-config"),
+		page_config_content: document.getElementById("page-config-content"),
+		config_open_button: document.getElementById("config-open-button"),
+		config_close_button: document.getElementById("config-close-button")
 	}
+
+	this.elems.config_open_button.addEventListener("click", this.showConfigPage.bind(this), false);
+	this.elems.config_close_button.addEventListener("click", this.hideConfigPage.bind(this), false);
 
 	this.config_file = 'js/config.json';
 	// this.config_file = 'js/config-test.json';
@@ -34,6 +41,9 @@ NickApp = function () {
 	this.config.servers.forEach(function(serv) {
 		var server = new NickApp.Server(this, serv.hostname, serv.nickname || this.config.nickname, serv.channels);
 		this.servers.push(server);
+		if (this.config.debug) {
+			server.client.opt.debug = true;
+		}
 	}, this);
 
 	this.main_window = gui.Window.get();
@@ -191,7 +201,74 @@ NickApp.prototype.saveConfig = function () {
 		});
 	}
 
-	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, '\t'), { encoding: 'utf8' });
+	return fs.writeFileSync(this.config_file, JSON.stringify(this.config, null, "\t"), { encoding: 'utf8' });
+}
+NickApp.prototype.setConfigPage = function() {
+	this.elems.page_config_content.innerHTML = "";
+
+	for (var opt in this.config) {
+		var opt_elem = document.createElement("p");
+		opt_elem.className = "option";
+
+		var opt_label = document.createElement("label");
+		var label = opt.split("_").join(" ");
+		opt_label.textContent = label.substring(0, 1).toUpperCase() + label.substring(1);
+
+		console.dir(typeof this.config[opt]);
+
+		switch (typeof this.config[opt]) {
+			case "boolean":
+				opt_elem.classList.add("option-boolean");
+
+				var opt_input = document.createElement("input");
+				opt_input.type = "checkbox";
+				opt_input.name = opt;
+				opt_input.checked = this.config[opt];
+
+				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = event.target.checked; }).bind(this, opt), false);
+			break;
+
+			case "string":
+				opt_elem.classList.add("option-string");
+
+				var opt_input = document.createElement("input");
+				opt_input.type = "text";
+				opt_input.name = opt;
+				opt_input.value = this.config[opt];
+
+				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = event.target.value; }).bind(this, opt), false);
+			break;
+
+			default:
+				opt_elem.classList.add("option-text");
+
+				var opt_input = document.createElement("textarea");
+				opt_input.name = opt;
+				var value = JSON.stringify(this.config[opt], null, "\t");
+				opt_input.value = value;
+				opt_input.rows = value.split("\n").length;
+
+				opt_input.addEventListener("change", (function(opt, event) { this.config[opt] = JSON.parse(event.target.value); }).bind(this, opt), false);
+			break;
+		}
+		opt_input.id = this.elems.page_config_content + "-option-" + opt;
+		opt_label.setAttribute("for", opt_input.id);
+
+		opt_elem.appendChild(opt_label);
+		opt_elem.appendChild(opt_input);
+
+		this.elems.page_config_content.appendChild(opt_elem);
+	}
+}
+NickApp.prototype.showConfigPage = function() {
+	this.elems.page_config.classList.add("show");
+	this.setConfigPage();
+	this.elems.config_open_button.blur();
+}
+NickApp.prototype.hideConfigPage = function() {
+	this.elems.page_config.classList.remove("show");
+	this.saveConfig();
+	this.elems.config_close_button.blur();
 }
 NickApp.prototype.setActiveTab = function (target, elem) {
 	elem.classList.remove("active");
@@ -392,6 +469,8 @@ NickApp.Server.prototype.onClientError = function (message) {
 	console.log("error : ", message);
 }
 NickApp.Server.prototype.onChannelsList = function (channels_list) {
+	channels_list.sort();
+
 	channels_list.forEach(function(chan) {
 		var channel_li = document.createElement("li");
 		channel_li.textContent = chan.name;
@@ -567,7 +646,15 @@ NickApp.Channel.prototype.destroy = function () {
 	this.tab_content.parentNode.removeChild(this.tab_content);
 	this.tab_users_list.parentNode.removeChild(this.tab_users_list);
 
-	this.app.showTab(this.server);
+	if (index > 0) {
+		this.app.showTab(this.server.channels[index-1]);
+	}
+	else if (this.server.channels[index]) {
+		this.app.showTab(this.server.channels[index]);
+	}
+	else {
+		this.app.showTab(this.server);
+	}
 
 	if (event) {
 		event.stopPropagation();
@@ -681,11 +768,6 @@ NickApp.Channel.prototype.onUserQuit = function (nickname, reason, message) {
 		content += ": " + reason;
 	}
 	this.addMessage(content, "user-quit", user);
-
-	if (nickname === this.server.temp_nickname) {
-		this.server.joinNewChannel(this.name);
-		this.destroy();
-	}
 }
 NickApp.Channel.prototype.onUserKilled = function (nickname, reason, message) {
 	var user = this.app.filter(this.users, { name: nickname }, true);
@@ -879,7 +961,15 @@ NickApp.PrivateDiscussion.prototype.destroy = function (event) {
 	this.tab.parentNode.removeChild(this.tab);
 	this.tab_content.parentNode.removeChild(this.tab_content);
 
-	this.app.showTab(this.server);
+	if (index > 0) {
+		this.app.showTab(this.server.discussions[index-1]);
+	}
+	else if (this.server.discussions[index]) {
+		this.app.showTab(this.server.discussions[index]);
+	}
+	else {
+		this.app.showTab(this.server);
+	}
 
 	if (event) {
 		event.stopPropagation();

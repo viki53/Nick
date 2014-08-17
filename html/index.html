@@ -7,11 +7,17 @@
 		<link rel="stylesheet" href="../css/nick-v1.css">
 	</head>
 	<body>
-		<div class="page" id="page-irc">
+		<div id="page-irc">
 			<ul id="irc-tabs"></ul>
 			<div id="irc-tabs-contents"></div>
 			<div id="irc-tabs-users"></div>
+			<button id="config-open-button" title="Configuration">☰</button>
 		</div>
+		<div id="page-config" class="popup">
+			<button id="config-close-button" title="Close">×</button>
+			<div id="page-config-content" class="popup-content"></div>
+		</div>
+		<div id="popup-overlay"></div>
 	</body>
 	<script src="../js/nick-v1.js"></script>
 </html>
