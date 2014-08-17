@@ -53,6 +53,8 @@ NickApp = function () {
 
 	// gui.Shell.openExternal("http://website.com") // Ouvre une fenêtre externe (pratique pour les liens)
 
+	this.main_window.on('blur', this.onWindowBlur.bind(this));
+
 	this.main_window.on('closed', this.onWindowClose.bind(this));
 
 	if (!this.config.hide_messages_details) {
@@ -61,6 +63,11 @@ NickApp = function () {
 	if (!this.config.hide_users_list) {
 		this.elems.page_irc.classList.add("show-users-list");
 	}
+}
+NickApp.prototype.onWindowBlur = function () {
+	Array.prototype.forEach.call(document.querySelectorAll("*:focus"), function (elem) {
+		elem.blur();
+	});
 }
 NickApp.prototype.onWindowClose = function () {
 	this.servers.forEach(function (server) {
@@ -310,71 +317,6 @@ NickApp.prototype.showTab = function (target) {
 	}
 	else if (target instanceof NickApp.Server) {
 		this.elems.page_irc.classList.add("viewing-server");
-	}
-}
-NickApp.prototype.onContentInputKeyUp = function (server, target, elem, event) {
-	if (event.which === 13) {
-		if (elem.value.trim()) {
-
-			if (elem.value.match(/^\/join/)) {
-				server.joinNewChannel(elem.value.substring(5).trim());
-				elem.value = "";
-				return;
-			}
-			else if (elem.value.match(/^\/nick/)) {
-				var newnickname = elem.value.substring(5).trim();
-				server.client.send("NICK", newnickname);
-
-				if (target instanceof NickApp.Channel) {
-					target.onUserNickChange(server.temp_nickname, newnickname);
-				}
-				else if (server.current_user) {
-					server.current_user.changeNickname(newnickname);
-				}
-
-				elem.value = "";
-				return;
-			}
-			else if (elem.value.match(/^\/color/)) {
-				if (target instanceof NickApp.Channel) {
-					var nickname = elem.value.substring(6).trim();
-
-					if (nickname) {
-						if (target instanceof NickApp.Channel) {
-							var user = this.filter(target.users, { name : nickname }, true);
-						}
-						else if (target instanceof NickApp.PrivateDiscussion) {
-							var user = target.user;
-						}
-
-						if (user) {
-							user.resetColor();
-						}
-					}
-					else {
-						if (target instanceof NickApp.Channel) {
-							target.users.forEach(function (user) {
-								user.resetColor();
-							}, target);
-						}
-						else if (target instanceof NickApp.PrivateDiscussion) {
-							target.user.resetColor();
-						}
-					}
-				}
-
-				elem.value = "";
-				return;
-			}
-
-			server.client.say(target.name, elem.value);
-
-			if (target.onMessage) {
-				target.onMessage(server.temp_nickname, elem.value);
-			}
-
-			elem.value = "";
-		}
 	}
 }
 NickApp.prototype.processMessageContent = function (li) {

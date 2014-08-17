@@ -37,7 +37,7 @@ NickApp.PrivateDiscussion = function (app, server, nickname) {
 	this.tab_content_input = document.createElement("input");
 	this.tab_content_input.type = "text";
 	this.tab_content_input.className = "irc-tab-content-input";
-	this.tab_content_input.addEventListener("keyup", this.app.onContentInputKeyUp.bind(this.app, this.server, this, this.tab_content_input), false);
+	this.tab_content_input.addEventListener("keyup", this.onContentInputKeyUp.bind(this, this.tab_content_input), false);
 	this.tab_content.appendChild(this.tab_content_input);
 
 	return this;
@@ -108,4 +108,51 @@ NickApp.PrivateDiscussion.prototype.resetUnread = function () {
 }
 NickApp.PrivateDiscussion.prototype.refreshScroll = function () {
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
+}
+
+NickApp.PrivateDiscussion.prototype.onContentInputKeyUp = function (elem, event) {
+	if (event.which === 13) {
+		if (elem.value.trim()) {
+
+			if (elem.value.match(/^\/join/)) {
+				this.server.joinNewChannel(elem.value.substring(5).trim());
+				elem.value = "";
+				return;
+			}
+			else if (elem.value.match(/^\/nick/)) {
+				var newnickname = elem.value.substring(5).trim();
+				this.server.client.send("NICK", newnickname);
+
+				if (this.server.current_user) {
+					this.server.current_user.changeNickname(newnickname);
+				}
+
+				elem.value = "";
+				return;
+			}
+			else if (elem.value.match(/^\/color/)) {
+				var nickname = elem.value.substring(6).trim();
+
+				if (nickname) {
+					var user = this.user;
+
+					if (user) {
+						user.resetColor();
+					}
+				}
+				else {
+					this.user.resetColor();
+				}
+
+				elem.value = "";
+				return;
+			}
+
+			this.server.client.say(this.name, elem.value);
+
+			this.onMessage(this.server.temp_nickname, elem.value);
+
+			elem.value = "";
+		}
+	}
 }

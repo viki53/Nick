@@ -40,7 +40,7 @@ NickApp.Channel = function (app, name, server) {
 	this.tab_content_input = document.createElement("input");
 	this.tab_content_input.type = "text";
 	this.tab_content_input.className = "irc-tab-content-input";
-	this.tab_content_input.addEventListener("keyup", this.app.onContentInputKeyUp.bind(this.app, this.server, this, this.tab_content_input), false);
+	this.tab_content_input.addEventListener("keyup", this.onContentInputKeyUp.bind(this, this.tab_content_input), false);
 	this.tab_content.appendChild(this.tab_content_input);
 
 	this.tab_users_list = document.createElement("ul");
@@ -273,4 +273,51 @@ NickApp.Channel.prototype.resetUnread = function () {
 }
 NickApp.Channel.prototype.refreshScroll = function () {
 	this.tab_content_list.scrollTop = this.tab_content_list.scrollHeight - this.tab_content_list.clientHeight;
+}
+
+NickApp.Channel.prototype.onContentInputKeyUp = function (elem, event) {
+	if (event.which === 13) {
+		if (elem.value.trim()) {
+
+			if (elem.value.match(/^\/join/)) {
+				this.server.joinNewChannel(elem.value.substring(5).trim());
+				elem.value = "";
+				return;
+			}
+			else if (elem.value.match(/^\/nick/)) {
+				var newnickname = elem.value.substring(5).trim();
+				this.server.client.send("NICK", newnickname);
+
+				this.onUserNickChange(this.server.temp_nickname, newnickname);
+
+				elem.value = "";
+				return;
+			}
+			else if (elem.value.match(/^\/color/)) {
+				var nickname = elem.value.substring(6).trim();
+
+				if (nickname) {
+					var user = this.app.filter(this.users, { name : nickname }, true);
+
+					if (user) {
+						user.resetColor();
+					}
+				}
+				else {
+					this.users.forEach(function (user) {
+						user.resetColor();
+					}, this);
+				}
+
+				elem.value = "";
+				return;
+			}
+
+			this.server.client.say(this.name, elem.value);
+
+			this.onMessage(this.server.temp_nickname, elem.value);
+
+			elem.value = "";
+		}
+	}
 }
