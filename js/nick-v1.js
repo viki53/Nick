@@ -108,7 +108,7 @@ NickApp.prototype.filter = function (array, predicate, returnFirst) {
 	return results;
 }
 NickApp.prototype.defaultConfig = {
-	nickname: "user" + Date.now(),
+	nickname: "user" + ("" + Date.now()).substring(-5),
 	servers: [
 		{
 			hostname: "irc.smoothirc.net",
@@ -172,11 +172,18 @@ NickApp.prototype.loadConfig = function () {
 			var conf = fs.readFileSync(this.config_file, { encoding: 'utf8' });
 
 			if (!conf) {
+				console.error("Config file not found", conf);
 				this.config = this.defaultConfig;
 				return;
 			}
 
-			this.config = JSON.parse(conf) || this.defaultConfig;;
+			var config = JSON.parse(conf);
+
+			if (!config) {
+				console.error("Config file could not be parsed", conf);
+				this.config = this.defaultConfig;
+			}
+			this.config = config;
 		}
 		catch(e) {
 			console.error(e);
