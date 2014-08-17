@@ -83,7 +83,7 @@ NickApp.prototype.filter = function (array, predicate, returnFirst) {
 	for (var i=0, nb=array.length; i<nb; i++){
 		loop_properties:
 		for (key in predicate) {
-			if (array[i][key] !== predicate[key]) {
+			if (array[i][key].toLowerCase() !== predicate[key].toLowerCase()) {
 				continue loop_items;
 			}
 		}
