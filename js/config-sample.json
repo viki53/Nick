@@ -1,5 +1,6 @@
 {
 	"nickname": "Nick",
+	"debug": true,
 	"servers": [
 		{
 			"hostname": "irc.smoothirc.net",

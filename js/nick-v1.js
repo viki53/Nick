@@ -32,7 +32,7 @@ NickApp = function () {
 	this.elems.config_close_button.addEventListener("click", this.hideConfigPage.bind(this), false);
 
 	this.config_file = 'js/config.json';
-	// this.config_file = 'js/config-test.json';
+	// this.config_file = 'js/config-sample.json';
 
 	this.config = {};
 
