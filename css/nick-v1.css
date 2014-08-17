@@ -281,12 +281,19 @@ textarea{
 .irc-tab-channels>li{
 	cursor: pointer;
 }
+.irc-tab-users>li[data-user-role]::before,
+.irc-tab-channels>li[data-users-number]::before{
+	display: inline-block;
+	font-weight: bold;
+}
 .irc-tab-users>li[data-user-role]::before{
 	content: attr(data-user-role) " ";
+	width: 1em;
 	color: #000;
 }
 .irc-tab-channels>li[data-users-number]::before{
 	content: "(" attr(data-users-number) ") ";
+	width: 2.5em;
 	color: #5677fc;
 }
 
