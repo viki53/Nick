@@ -15,6 +15,8 @@ Date.prototype.toIRCformat = function() {
 }
 
 NickApp = function () {
+	console.log("Creating a new App");
+
 	this.elems = {
 		page_irc: document.getElementById("page-irc"),
 		irc_tabs: document.getElementById("irc-tabs"),
@@ -392,6 +394,8 @@ NickApp.prototype.openExternalLink = function (href) {
 
 
 NickApp.Server = function (app, hostname, nickname, channels_names) {
+	console.log("Creating a new Server");
+
 	this.app = app;
 
 	this.name = hostname;
@@ -578,6 +582,8 @@ NickApp.Server.prototype.refreshScroll = function () {
 
 
 NickApp.Channel = function (app, name, server) {
+	console.log("Creating a new Channel");
+
 	this.app = app;
 
 	this.name = name;
@@ -854,6 +860,8 @@ NickApp.Channel.prototype.refreshScroll = function () {
 
 
 NickApp.User = function (app, server, target, name, role) {
+	console.log("Creating a new User");
+	
 	this.app = app;
 	this.server = server;
 	this.target = target;
@@ -913,6 +921,8 @@ NickApp.User.prototype.destroy = function () {
 
 
 NickApp.PrivateDiscussion = function (app, server, nickname) {
+	console.log("Creating a new PrivateDiscussion");
+	
 	this.app = app;
 	this.server = server;
 
