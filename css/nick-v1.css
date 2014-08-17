@@ -307,6 +307,7 @@ textarea{
 	color: #757575;
 	background-color: #eeeeee;
 	border-top: 1px solid #e0e0e0;
+	border-left: 1px solid #e0e0e0;
 }
 #config-open-button:hover{
 	background-color: #fff;
