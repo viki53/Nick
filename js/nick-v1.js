@@ -15,7 +15,7 @@ Date.prototype.toIRCformat = function() {
 }
 
 NickApp = function () {
-	console.log("Creating a new App");
+	console.log("Creating a new App", arguments);
 
 	this.elems = {
 		page_irc: document.getElementById("page-irc"),
@@ -39,6 +39,8 @@ NickApp = function () {
 	this.servers = [];
 
 	this.loadConfig();
+
+	console.log("Loaded config", this.config);
 
 	this.config.servers.forEach(function(serv) {
 		var server = new NickApp.Server(this, serv.hostname, serv.nickname || this.config.nickname, serv.channels);
@@ -394,7 +396,7 @@ NickApp.prototype.openExternalLink = function (href) {
 
 
 NickApp.Server = function (app, hostname, nickname, channels_names) {
-	console.log("Creating a new Server");
+	console.log("Creating a new Server", arguments);
 
 	this.app = app;
 
@@ -582,7 +584,7 @@ NickApp.Server.prototype.refreshScroll = function () {
 
 
 NickApp.Channel = function (app, name, server) {
-	console.log("Creating a new Channel");
+	console.log("Creating a new Channel", arguments);
 
 	this.app = app;
 
@@ -860,7 +862,7 @@ NickApp.Channel.prototype.refreshScroll = function () {
 
 
 NickApp.User = function (app, server, target, name, role) {
-	console.log("Creating a new User");
+	console.log("Creating a new User", arguments);
 	
 	this.app = app;
 	this.server = server;
@@ -921,7 +923,7 @@ NickApp.User.prototype.destroy = function () {
 
 
 NickApp.PrivateDiscussion = function (app, server, nickname) {
-	console.log("Creating a new PrivateDiscussion");
+	console.log("Creating a new PrivateDiscussion", arguments);
 	
 	this.app = app;
 	this.server = server;
