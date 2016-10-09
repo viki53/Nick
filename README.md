@@ -16,8 +16,8 @@ Cette application est basée sur [Electron](http://electron.atom.io/), qui est d
 
 ### Configuration nécessaire
 
-* Mac OS X (10.9+), Windows ou Linux
-* Node.js et NPM installés
+* macOS / OS X (10.9+), Windows 7+, Ubuntu 12.04+, Fedora 21+, Debian 8+
+* Node.js (4.6 minimum) et NPM installés
 
 ### Installer les dépendances
 
