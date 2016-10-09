@@ -1,33 +1,49 @@
 {
-	"name": "Nick",
-	"title": "Nick — IRC Client",
-	"description": "Un client IRC simple et ergonomique",
-	"keywords": ["IRC", "client", "simple"],
-	"version": "0.1.0",
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:viki53/Nick.git"
-	},
-	"bugs": {
-		"url": "https://github.com/viki53/Nick/issues"
-	},
-	"main": "html/index.html",
-	"author": {
-		"name": "Corentin Hatte",
-		"email": "contact@corentin-hatte.eu",
-		"web": "http://corentin-hatte.eu/"
-	},
-	"window": {
-		"width": 800,
-		"height": 600,
-		"min_width": 600,
-		"min_height": 300,
-		"position": "center",
-		"toolbar": false,
-		"frame": true,
-		"icon": "img/logo-72x72.png"
-	},
-	"dependencies": {
-		"irc": "0.3.7"
-	}
+  "name": "Nick",
+  "title": "Nick — IRC Client",
+  "description": "Un client IRC simple et ergonomique",
+  "licenses": [
+    {
+      "type": "UNLICENSED"
+    }
+  ],
+  "keywords": [
+    "simple",
+    "easy-to-use",
+    "IRC",
+    "client"
+  ],
+  "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:viki53/Nick.git"
+  },
+  "bugs": {
+    "url": "https://github.com/viki53/Nick/issues"
+  },
+  "main": "src/main.js",
+  "author": {
+    "name": "Corentin Hatte",
+    "email": "contact@corentin-hatte.eu",
+    "web": "https://corentin-hatte.eu/"
+  },
+  "scripts": {
+    "start": "./node_modules/.bin/electron ."
+  },
+  "window": {
+    "width": 800,
+    "height": 600,
+    "min_width": 600,
+    "min_height": 300,
+    "position": "center",
+    "toolbar": false,
+    "frame": true,
+    "icon": "img/logo-72x72.png"
+  },
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "electron": "^1.4.3"
+  }
 }
